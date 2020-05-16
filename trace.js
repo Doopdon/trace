@@ -18,7 +18,8 @@ function trace(context){
             function isContent(param){
                 return allowedTypes.includes(typeof(param)) 
                 || param instanceof renderObject 
-                || Array.isArray(param);
+                || Array.isArray(param)
+                || param instanceof Element;
             }
             function isAttributes(param){
                 return !!param;
@@ -37,7 +38,7 @@ function trace(context){
                 return newElem;
             }
             this.render = function(parent){
-                if(!parent) throw "you need to add parent element to rend function";
+                if(!parent) throw "you need to add parent element to render function div().render(referenceToParentElem)";
                 this.element = createElement();
                 parent.appendChild(this.element);
                 return this.element;
@@ -54,6 +55,9 @@ function trace(context){
                 function setContent(element,content){
                     if(allowedTypes.includes(typeof content)) 
                         return (element.innerHTML = content);
+                    if(content instanceof Element)
+                        return elem.appendChild(content)
+
                     setContentRecursive(content);
                     
                     function setContentRecursive(cnt){
@@ -229,7 +233,7 @@ class renderList{
 //onRender "event" for renderObject 3
 //todo "footer" prop for lists. 3
 //loose focus update. 2
-
-//allow element objects in render array 2
+//blank() function returns div elem for easy parent. 
+//merge render and rerender 3
 
 
