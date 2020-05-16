@@ -2,6 +2,7 @@ function trace(context){
     context = context || {};
     var allowedTypes = "string,number,boolean".split(',');
     var elemTypes = "a,p,br,div,span,h1,h2,h3,h4,h5,h6,table,tr,td,th,label,button,textArea".split(',');
+    context.blank = function(){return document.createElement('div')};
     elemTypes.forEach(function(elemName){
         context[elemName] = function(param1,param2){return generateElement(elemName,param1,param2)}
     })
@@ -41,6 +42,12 @@ function trace(context){
             ref.delete = function(){
                 this.element.parentNode.removeChild(this.element)
             }
+            ref.onRender = function(callback){
+                return{render:function(parent,elem){
+                    var elem = ref.render(parent,elem);
+                    callback(elem,ref);
+                }}
+            }
             function createElement(){
                 var elem = document.createElement(elemType);
                 params.content != null && params.content != undefined && setContent(elem,params.content);
@@ -51,13 +58,13 @@ function trace(context){
                     if(allowedTypes.includes(typeof content)) 
                         return (element.innerHTML = content);
                     if(content instanceof Element)
-                        return elem.appendChild(content)
+                        return element.appendChild(content)
 
-                    setContentRecursive(content);
-                    
+                    setContentRecursive(content);  
                     function setContentRecursive(cnt){
                         if(Array.isArray(cnt)) return cnt.forEach(setContentRecursive);
                         cnt.render && cnt.render(element);
+                        cnt instanceof Element && element.appendChild(cnt);
                     }
                 }
 
@@ -225,10 +232,8 @@ class renderList{
 //todo remove renderfunctions from the renderlist that are no longer viable 13
 //todo stop user from using multiple lists per parent 5
 //todo renderProp attributes/value 5
-//onRender "event" for renderObject 3
 //todo "footer" prop for lists. 3
 //loose focus update. 2
-//blank() function returns div elem for easy parent. 
-//merge render and rerender 3
+//add string so that content can be typed 5
 
 

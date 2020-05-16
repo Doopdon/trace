@@ -113,3 +113,10 @@ function intro(){
     ])
 }
 
+function types(){
+    trace(this)
+    return div([
+        h1('things').render(blank())
+    ])
+}
+
