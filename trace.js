@@ -29,21 +29,16 @@ function trace(context){
 
     class renderObject{
         constructor(params,elemType){
+            var ref = this;
             var _params =  params;
-            this.reRender = function(parent,oldElem){
-                var newElem = createElement();
-                parent.insertBefore(newElem,oldElem);
-                parent.removeChild(oldElem);
-                this.element = newElem;
-                return newElem;
-            }
-            this.render = function(parent){
-                if(!parent) throw "you need to add parent element to render function div().render(referenceToParentElem)";
+            ref.render = function(parent,oldElem){
                 this.element = createElement();
-                parent.appendChild(this.element);
+                oldElem && parent.insertBefore(this.element,oldElem);
+                oldElem && parent.removeChild(oldElem);
+                !oldElem && parent.appendChild(this.element);
                 return this.element;
             }
-            this.delete = function(){
+            ref.delete = function(){
                 this.element.parentNode.removeChild(this.element)
             }
             function createElement(){
@@ -100,7 +95,7 @@ class renderProp{
             ref.__renders = ref.__renders.filter(function(x){
                 if(!isOnDocument(x.elem)) return false;
                 if(x.bound && (x.elem.contains(document.activeElement) || x.elem === document.activeElement)) return true;
-                var newElem = x.renderFunction(ref.__value,utils).reRender(x.parent,x.elem)
+                var newElem = x.renderFunction(ref.__value,utils).render(x.parent,x.elem)
                 x.elem =  newElem;
                 return true;
             })
