@@ -2,6 +2,7 @@ function trace(context){
     context = context || {};
     var allowedTypes = "string,number,boolean".split(',');
     var elemTypes = "a,p,br,div,span,h1,h2,h3,h4,h5,h6,table,tr,td,th,label,button,textArea".split(',');
+    
     context.blank = function(){return document.createElement('div')};
     elemTypes.forEach(function(elemName){
         context[elemName] = function(param1,param2){return generateElement(elemName,param1,param2)}
@@ -28,53 +29,52 @@ function trace(context){
         }
     }
 
-    class renderObject{
-        constructor(params,elemType){
-            var ref = this;
-            var _params =  params;
-            ref.render = function(parent,oldElem){
-                this.element = createElement();
-                oldElem && parent.insertBefore(this.element,oldElem);
-                oldElem && parent.removeChild(oldElem);
-                !oldElem && parent.appendChild(this.element);
-                return this.element;
-            }
-            ref.delete = function(){
-                this.element.parentNode.removeChild(this.element)
-            }
-            ref.onRender = function(callback){
-                return{render:function(parent,elem){
-                    var elem = ref.render(parent,elem);
-                    callback(elem,ref);
-                }}
-            }
-            function createElement(){
-                var elem = document.createElement(elemType);
-                params.content != null && params.content != undefined && setContent(elem,params.content);
-                params.attributes && setAttributes(elem,params.attributes);
-                return elem;
+    function renderObject(params,elemType){
+        var ref = this;
+        ref.parameters = params,
+        ref.elementType = elemType
+        ref.render = function(parent,oldElem){
+            ref.element = createElement();
+            oldElem && parent.insertBefore(ref.element,oldElem);
+            oldElem && parent.removeChild(oldElem);
+            !oldElem && parent.appendChild(ref.element);
+            return ref.element;
+        }
+        ref.delete = function(){
+            ref.element.parentNode.removeChild(ref.element)
+        }
+        ref.onRender = function(callback){
+            return{render:function(parent,elem){
+                var elem = ref.render(parent,elem);
+                callback(elem,ref);
+            }}
+        }
+        function createElement(){
+            var elem = document.createElement(elemType);
+            params.content != null && params.content != undefined && setContent(elem,params.content);
+            params.attributes && setAttributes(elem,params.attributes);
+            return elem;
 
-                function setContent(element,content){
-                    if(allowedTypes.includes(typeof content)) 
-                        return (element.innerHTML = content);
-                    if(content instanceof Element)
-                        return element.appendChild(content)
+            function setContent(element,content){
+                if(allowedTypes.includes(typeof content)) 
+                    return (element.innerHTML = content);
+                if(content instanceof Element)
+                    return element.appendChild(content)
 
-                    setContentRecursive(content);  
-                    function setContentRecursive(cnt){
-                        if(Array.isArray(cnt)) return cnt.forEach(setContentRecursive);
-                        cnt.render && cnt.render(element);
-                        cnt instanceof Element && element.appendChild(cnt);
-                    }
+                setContentRecursive(content);  
+                function setContentRecursive(cnt){
+                    if(Array.isArray(cnt)) return cnt.forEach(setContentRecursive);
+                    cnt.render && cnt.render(element);
+                    cnt instanceof Element && element.appendChild(cnt);
                 }
+            }
 
-                function setAttributes(element,attributes){
-                    Object.keys(attributes).forEach(function(key){
-                        (typeof attributes[key] == "function") && 
-                        (element[key] = attributes[key]) || 
-                        element.setAttribute(key,attributes[key])
-                    });
-                }
+            function setAttributes(element,attributes){
+                Object.keys(attributes).forEach(function(key){
+                    (typeof attributes[key] == "function") && 
+                    (element[key] = attributes[key]) || 
+                    element.setAttribute(key,attributes[key])
+                });
             }
         }
     }
@@ -86,25 +86,27 @@ class renderProp{
         if(value instanceof renderProp) ref.value = value.get();
         ref.__renders = [];
         ref.__value = value;
-
-        var utils;
-        function isOnDocument(element){
-            return document.body.contains(element);
-        }
         ref.id = id;
+        var utils;
+  
         ref.update = function(updateFunction){
-            this.set(updateFunction(this.get()))
+            ref.set(updateFunction(ref.get()))
         }
         ref.get = function(){return ref.__value};
         ref.set = function(newValue){
             ref.__value =  newValue;
             ref.__value = newValue;
             ref.__renders = ref.__renders.filter(function(x){
-                if(!isOnDocument(x.elem)) return false;
-                if(x.bound && (x.elem.contains(document.activeElement) || x.elem === document.activeElement)) return true;
+                if(!document.body.contains(x.elem)) return false;
+                if(x.unFoc && (x.elem.contains(document.activeElement) || x.elem === document.activeElement)) return true;
                 var newElem = x.renderFunction(ref.__value,utils).render(x.parent,x.elem)
                 x.elem =  newElem;
                 return true;
+            })
+        }
+        ref.deleteAll = function(){
+            ref.__renders.forEach(x=>{
+                x.parent.removeChild(x.elem);
             })
         }
         ref.ufDisplay = function(renderFunction,utl){
@@ -113,26 +115,19 @@ class renderProp{
         ref.display = function(renderFunction,utl){
             return bind(renderFunction,utl,false)
         }
-        function bind(renderFunction,utl,uf){
-            utils = utl
+
+        function bind(renderFunction,utl,unFoc){
+            utils = utl;
             return {
                 render:function(parent){
                     var elem = renderFunction(ref.__value,utils).render(parent);
-                    var bound = uf;
-                    ref.__renders.push({renderFunction,elem,parent,bound})
+                    ref.__renders.push({renderFunction,elem,parent,unFoc})
                     return elem;
                 }
             }
         }
-        ref.deleteAll = function(){
-            ref.__renders.forEach(x=>{
-                x.parent.removeChild(x.elem);
-            })
-        }
-        
     }
 }
-
 
 class renderList{
     constructor(values){
@@ -182,7 +177,7 @@ class renderList{
                 getIndex:function(){
                     return getIndexFromId(rProp.id);
                 },
-                get:function(){
+                val:function(){
                     return ref.at(getIndexFromId(rProp.id))
                 }
             }
@@ -210,7 +205,6 @@ class renderList{
                 return rProp.__renders.find(x=> x.parent == parent)
             }
         }
-
         ref.deleteAt = function(index){
             var rProp = ref.__values[index];
             if(!rProp) return null;
@@ -218,7 +212,6 @@ class renderList{
             ref.__values.splice(index,1);
             return rProp.get();
         }
-
         ref.display = function(renderFunction){
             return {render:function(parent){
                 ref.__renders.push({renderFunction,parent});
@@ -235,5 +228,7 @@ class renderList{
 //todo "footer" prop for lists. 3
 //loose focus update. 2
 //add string so that content can be typed 5
+//todo add all html elements 5
+//todo turn classes into methods 3
 
 

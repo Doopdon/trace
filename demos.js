@@ -24,7 +24,7 @@ function makeThing3(){
                 button({onclick:()=>u.insertAfter(index++)},'insert after'),
                 button({onclick:u.delete},'delete'),
                 button({onclick:()=>alert(u.getIndex())},'getIndex'),
-                button({onclick:()=>u.get().update(x=>x+1)},'edit'),
+                button({onclick:()=>u.val().update(x=>x+1)},'edit'),
             ]))
         ]),
         
