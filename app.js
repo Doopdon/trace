@@ -7,13 +7,6 @@ var demos = [
 ]
 
 function app(root){
-    trace(this)
-    div(
-        h1('things').render(document.createElement('div'))
-    ).render(root)
-
-
-    return 
     var state = new renderProp(0);
     trace(this);
     div([
