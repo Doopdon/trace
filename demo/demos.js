@@ -131,11 +131,11 @@ function bindingDemo(){
         br(),
         label({class:'red-text'},'this text just uses the default display but it causes issues when editing (try and see)'),
         br(),
-        state.display(x=>textArea({onkeyup:(e)=>{state.set(e.target.value)}},x)),        
+        state.display(x=>textarea({onkeyup:(e)=>{state.set(e.target.value)}},x)),        
         br(),
         label({class:'blue-text'},'this text area uses ufDisplay() or un-focused display, it wont update when the element has focus, or contains the element with focus.'),
         br(),
-        state.ufDisplay(x=>textArea({onkeyup:(e)=>{state.set(e.target.value)}},x)),
+        state.ufDisplay(x=>textarea({onkeyup:(e)=>{state.set(e.target.value)}},x)),
         
     ])
 }
