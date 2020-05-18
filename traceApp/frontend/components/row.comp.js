@@ -6,7 +6,7 @@ function rowComp(data,util){
         td({class:'row-item'},[
             data.name.ufDisplay(//using an un-focused display so that it will not update unless its not focused TODO update when focus is lost
                 theValueInTheRenderProp=>textArea( //ufDisplay/display call a function with the value you gave it
-                    {onkeyup:e=>data.name.set(e.target.value)},//when the key is up I set the value to the target value causing the renderProp's "state" to update
+                    {onkeyup:e=>data.name.set(e.target.value)},//when the key is up I set the value to the target value causing the RenderProp's "state" to update
                      theValueInTheRenderProp)//this should just be a string of what is in the render prop. //TODO make ['string'] work.
             )
         ]),
@@ -17,7 +17,7 @@ function rowComp(data,util){
             h5(data.numUpdates)
         ]),
         td({class:'row-item'},[
-            coolButton('delete',()=>{deleteRecord(data.id,util.delete)})//the util that gets passed into all renderList items has a delete function for easy list manipulation
+            coolButton('delete',()=>{deleteRecord(data.id,util.delete)})//the util that gets passed into all RenderList items has a delete function for easy list manipulation
         ]),
         td({class:'row-item'},[
             coolButton('save',()=>{
