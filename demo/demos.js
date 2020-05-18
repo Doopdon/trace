@@ -1,13 +1,12 @@
 var demos = [
-    test,
-    
     intro,
     intoContinued,
     bindingDemo,
     makeBigInEfficientGraph,
     makeBigEfficientGraph,
+    atrInEfficientTest,
+    atrEfficientTest,
     listDemo,
-   
 ]
 
 function app(root){
@@ -212,12 +211,40 @@ function intoContinued(){
 // }
 
 //this should run through every type trace can handle eventually.
-function test(){
-    trace(this)
-    var o = new RenderProp(3)
-    setTimeout(()=>{o.set(5)},3000)
-    
-    return o.display(x=>h1({class:o.atr(x=>['red','green','blue'][x%3])},x))
-
+function atrEfficientTest(){
+    var p = new RenderProp(5);
+    return div([
+        h5('Here the "atr" function is called. it only updates the element it is an attribute of. it\'s much more efficient'),
+        h1({class:p.atr(classTest), onclick:x=>p.update(x=>x+1)},'click me'),
+        fortyK()
+    ])
 }
 
+function atrInEfficientTest(){
+    var p = new RenderProp(6);
+    return div([
+        h5('here you can see what happens if you try to update the class of a parent element with a display'),
+        h5('you can see that it needs to re render all 40k elements when the element re renders, but there is a solution'),
+        p.display(x=>div([
+            h1({class:classTest(x), onclick:x=>p.update(x=>x+1)},'click me'),
+            fortyK()
+        ]))
+    ]);
+}
+
+function classTest(x){
+    return ['red-text','green-text','blue-text'][x%3]
+}
+
+function fortyK(){
+    var a = [];
+    var size = 200
+    for(var i = 0; i < size; i++){
+        var b = []
+        for(var j = 0; j < size; j++){
+            b.push(j)
+        }
+        a.push(b)
+    }
+    return div(a.map(x=>div({class:'column'},x.map(y=>div({class:'point'})))))
+}

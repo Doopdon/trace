@@ -1,14 +1,11 @@
 function trace(context){
     context = context || {};
     var allowedTypes = "string,number,boolean".split(','); 
-    var elemTypes = 
+
     "a,abbr,acronym,address,applet,area,article,aside,audio,b,base,basefont,bb,bdo,big,blockquote,body,br,button,canvas,caption,center,cite,code,col,colgroup,command,datagrid,datalist,dd,del,details,dfn,dialog,dir,div,dl,dt,em,embed,eventsource,fieldset,figcaption,figure,font,footer,form,frame,frameset,h1,h2,h3,h4,h5,h6,head,header,hgroup,hr,html,i,iframe,img,input,ins,isindex,kbd,keygen,label,legend,li,link,map,mark,menu,meta,meter,nav,noframes,noscript,object,ol,optgroup,option,output,p,param,pre,progress,q,rp,rt,ruby,s,samp,script,section,select,small,source,span,strike,strong,style,sub,sup,table,tbody,td,textarea,tfoot,th,thead,time,title,tr,track,tt,u,ul,var,video,wbr"
-    .split(',');
-    
-    context.blank = function(){return document.createElement('div')};
-    elemTypes.forEach(function(elemName){
+    .split(',').forEach(function(elemName){
         context[elemName] = function(param1,param2,extra){
-            if(extra) throw "RenderObject cannot have more than 2 parameters"
+            if(extra) throw elemName+"() cannot have more than 2 parameters"
             return generateElement(elemName,param1,param2)}
     })
     return context
@@ -93,24 +90,31 @@ class RenderProp{
         var ref = this;
         if(value instanceof RenderProp) ref.value = value.get();
         ref.__renders = [];
+        ref.__atrRenders = [];
         ref.__value = value;
   
         ref.update = function(updateFunction){
+            updateFunction = updateFunction || function(x){return x}
             ref.set(updateFunction(ref.get()))
         }
         ref.get = function(){return ref.__value};
         ref.set = function(newValue){
             ref.__value =  newValue;
-            ref.__value = newValue;
             ref.__renders = ref.__renders.filter(function(x){
                 if(!document.body.contains(x.elem)) {
                     ref.onDeleteRF && ref.onDeleteRF(x.renderFunction)
-                    return false;}
-                if(x.unFoc && (x.elem.contains(document.activeElement) || x.elem === document.activeElement)) return true;
+                    return false;
+                }
+                if(x.unFoc && x.elem.contains(document.activeElement)) return true;
                 var renderObj = x.renderFunction(ref.__value,ref)
                 var newElem = renderObj.render(x.parent,x.elem)
                 x.elem =  newElem;
                 return true;
+            })
+            ref.__atrRenders.filter(function(x){
+                if(!document.body.contains(x.elem)) return false;
+                x.atrRender();
+                return true
             })
         }
         ref.deleteAll = function(){
@@ -119,7 +123,7 @@ class RenderProp{
             })
         }
 
-        ref.ufDisplay = function(renderFunction,utl){return bind(renderFunction,utl,true)}
+        ref.ufDisplay = function(renderFunction){return bind(renderFunction,true)}
         ref.display = function(renderFunction){return bind(renderFunction,false)}
         function bind(renderFunction,unFoc){
             return {
@@ -137,9 +141,11 @@ class RenderProp{
         ref.atr = function(renderFunction){
             return new (function(){
                 var atrObj = this;    
-                atrObj.renderFunction =  renderFunction;
+                atrObj.renderFunction =  renderFunction || (function(x){return x});
                 atrObj.genAtr = function(atrName,elem){
-                    elem.setAttribute(atrName,renderFunction(ref.__value))
+                    var atrRender = ()=>{elem.setAttribute(atrName,atrObj.renderFunction(ref.__value))}
+                    ref.__atrRenders.push({atrRender,elem});
+                    atrRender();
                 }
             })()
         }
@@ -172,7 +178,10 @@ class RenderList{
     constructor(values){
         var ref = this;
         var idItr= 0;
-        ref.__values = values.map(x=>new RenderListItem(x,idItr++,getUtils,deleteRF));//here111
+        ref.__values = values.map(function(x){
+            if(x instanceof RenderProp) return RenderListItem.generateFromRenderProp(xidItr++,getUtils,deleteRF)
+            return new RenderListItem(x,idItr++,getUtils,deleteRF)
+        });
         ref.__renders = [];
 
         ref.at = function(index){return ref.__values[index];}
@@ -246,14 +255,21 @@ class RenderList{
 
 //autocomplete fix for vscode 26
 //todo stop user from using multiple lists per parent 5
-//todo RenderProp attributes/values 5
 //todo "footer" prop for lists. 5
-//loose focus update. 2
-//todo make trace work on both front and backend
-//todo make trace handle onkeypress events.
+//loose focus update. 5
+//todo make trace work on both front and backend 13
+//todo make trace handle onkeypress events. 5
 //todo rename it it "gium" or "vestigium" or "nishaan" or "rastro" or "Spur" or something
-//todo revisit renderprop mapping "here111"
-//todo make atr(x=>x) and update(x=>x) default
-//todo make an atr demo
 //todo make an atrInnerHtml thing
+
+
+//bug does not look like you can return a x.display() result ???
+
+// function atrInEfficientTest(){
+//     var p = new RenderProp(5);
+//     return p.display(x=>div([
+//         h1({class:x, onclick:x=>p.update(x=>x+1)},'click me'),
+//         fortyK()
+//     ]));
+// }
 

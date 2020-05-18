@@ -4,14 +4,17 @@
 
 .blue{
   background-color: blue;
+  border: 1px solid blue;
 }
 
 .red{
   background-color: red;
+  border: 1px solid red;
 }
 
 .green{
   background-color: green;
+  border: 1px solid green;
 }
 
 .blue-text{
@@ -24,4 +27,14 @@
 
 .green-text{
   color: green;
+}
+
+.point{
+  width: 1px;
+  height: 1px;
+  margin: 1px;
+  background-color: black;
+}
+.column{
+  float: left;
 }
