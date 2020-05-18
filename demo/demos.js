@@ -1,5 +1,5 @@
 var demos = [
-    test,
+   // test,
     intro,
     intoContinued,
     bindingDemo,
