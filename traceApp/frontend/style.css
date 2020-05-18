@@ -1,0 +1,63 @@
+.list{
+    float:left;
+}
+
+.blue{
+  background-color: blue;
+}
+
+.red{
+  background-color: red;
+}
+
+.green{
+  background-color: green;
+}
+
+.blue-text{
+  color: blue;
+}
+
+.red-text{
+  color: red;
+}
+
+.green-text{
+  color: green;
+}
+.flex{
+  display: flex;
+  flex-direction: row;
+}
+
+.row-item{
+  margin:10px;
+  text-align: center;
+  justify-content: center;
+}
+
+a.button3{
+  display: inline-block;
+  padding:0.3em 1.2em;
+  margin:0 0.3em 0.3em 0;
+  border-radius:2em;
+  box-sizing: border-box;
+  text-decoration:none;
+  font-family:'Roboto',sans-serif;
+  font-weight:300;
+  color:#FFFFFF;
+  background-color:#4eb5f1;
+  text-align:center;
+  transition: all 0.2s;
+  height: 30px;
+}
+a.button3:hover{
+  background-color:#4095c6;
+  cursor: pointer;
+}
+@media all and (max-width:30em){
+   a.button3{
+    display:block;
+    margin:0.2em auto;
+  }
+}

@@ -179,7 +179,7 @@ class renderList{
                 },
                 val:function(){
                     return ref.at(getIndexFromId(rProp.id))
-                }
+                },
             }
         }
 
@@ -221,14 +221,64 @@ class renderList{
     }
 }
 
+//IT AINT DONE YET
+
 //autocomplete fix for vscode 26
 //todo remove renderfunctions from the renderlist that are no longer viable 13
 //todo stop user from using multiple lists per parent 5
-//todo renderProp attributes/value 5
+//todo renderProp attributes/values 5
 //todo "footer" prop for lists. 3
 //loose focus update. 2
-//add string so that content can be typed 5
 //todo add all html elements 5
 //todo turn classes into methods 3
+//todo add better error for handing in null instead of renderObject
+//todo add way to parse out all renderProps/lists and turn it back into a simple object
+//TODO make ['string'] work.
+//todo capitalize object names
+//todo make trace work on both front and backend
+//todo make trace handle onkeypress events.
+
+
+
+//bugs the render on a renderList does not remove existing element.  vvvv broken code vvvv
+// var state = new renderProp({data:null})
+
+// function app(root){
+//     trace(this);
+//     div([
+//         state.display(x=>{
+//             if(!x.data) 
+//                 return h1('Loading...')
+//             let y = x.data.display(x=>h1('item'))
+//             return y;
+//         })
+//     ]).render(root)
+// }
+
+// //fetch('/api/test').then(x=>console.log(x))
+// makeCall('getall',data=>{
+//     state.update(x=>{
+//         x.data = new renderList(JSON.parse(data))
+//         return x;
+//     })
+// })
+// var _root = document.getElementById('root');
+// app(_root)
+
+// function makeCall(route,callback) {
+//     var xhttp = new XMLHttpRequest();
+//     xhttp.onreadystatechange = function() {
+//         if (this.readyState == 4 && this.status == 200)
+//             callback(this.response)
+//     };
+//     xhttp.open("GET", "api/"+route, true);
+//     xhttp.send();
+// }
+
+//needs to take renderObject alone 
+//td([coolButton('buy')]) vs td(coolButton('buy'))
+
+
+
 
 
