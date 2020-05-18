@@ -1,4 +1,4 @@
-var state = new renderProp({data:null})//this is the global state. it has a "state" inside it that can be changed independently
+var state = new RenderProp({data:null})//this is the global state. it has a "state" inside it that can be changed independently
 
 function app(root){
     trace(this);//this attaches all the div/h1/table methods to this function (I do this to avoid polluting the global scope) with 800 3 letter functions
@@ -11,7 +11,7 @@ function app(root){
             return tableComp(x.data);//here I am using a "table component" I could write out the whole table but this is a custom table
         }),
         coolButton('add new',()=>addRecord(//make a crud call
-            x=>state.get().data.append(new DataForRendering(x))//simply get the state, get is "renderList" property called "data", and call its append method to add the new item.
+            x=>state.get().data.append(new DataForRendering(x))//simply get the state, get is "RenderList" property called "data", and call its append method to add the new item.
         )),
     ]).render(root)//all RenderObjects have a "render" function that takes a parent and returns an element
 }
@@ -20,15 +20,15 @@ app(document.getElementById('root'))//get the root div and the app will attach i
 //this just calls the server to ask for the stuff
 getCurrentData(data=>{
     var processedData = data.map(x=>new DataForRendering(x))//turn all the items into "DataForRendering" objects
-    state.set({data:new renderList(processedData)})//set the states value. its value has a data prop.
+    state.set({data:new RenderList(processedData)})//set the states value. its value has a data prop.
 })
 
 //here is what the data in the state's data array looks like
 class DataForRendering{
-    constructor(data){//takes a simple object and turns one of its props into a renderProp
+    constructor(data){//takes a simple object and turns one of its props into a RenderProp
         this.id = data.id;
-        this.name = new renderProp(data.name);//using a renderProp for the name so you can see how it helps.
-        this.quantity = data.quantity;//intentionally not making this a renderProp so you can see its still possible to work with.
+        this.name = new RenderProp(data.name);//using a RenderProp for the name so you can see how it helps.
+        this.quantity = data.quantity;//intentionally not making this a RenderProp so you can see its still possible to work with.
         this.numUpdates = data.numUpdates;
     }
 }

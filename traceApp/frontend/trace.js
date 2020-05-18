@@ -5,15 +5,20 @@ function trace(context){
     
     context.blank = function(){return document.createElement('div')};
     elemTypes.forEach(function(elemName){
-        context[elemName] = function(param1,param2){return generateElement(elemName,param1,param2)}
+        context[elemName] = function(param1,param2,extra){
+            if(extra) throw "RenderObject cannot take more than 2 parameters"
+            return generateElement(elemName,param1,param2)}
     })
     
-    function generateElement(elemType,param1,param2){
+    function generateElement(elemType,param1,param2,extra){
         var params = processParams(param1,param2)
         return new renderObject(params,elemType)
 
         function processParams(param1,param2){
-            if(isContent(param1)) return {content:param1}
+            if(isContent(param1)){
+                if(!param2) return {content:param1}
+                else throw "cannot have another parameter after content"
+            } 
             if(isContent(param2) && isAttributes(param1)) return {attributes:param1,content:param2}
             if(isAttributes(param1)) return {attributes:param1}
             return {};
@@ -56,14 +61,13 @@ function trace(context){
             return elem;
 
             function setContent(element,content){
-                if(allowedTypes.includes(typeof content)) 
-                    return (element.innerHTML = content);
-                if(content instanceof Element)
-                    return element.appendChild(content)
-
                 setContentRecursive(content);  
                 function setContentRecursive(cnt){
                     if(Array.isArray(cnt)) return cnt.forEach(setContentRecursive);
+                    if(allowedTypes.includes(typeof cnt)) 
+                        return (element.innerHTML += cnt);
+                    if(content instanceof Element)
+                        return element.appendChild(cnt)
                     cnt.render && cnt.render(element);
                     cnt instanceof Element && element.appendChild(cnt);
                 }
@@ -80,10 +84,10 @@ function trace(context){
     }
 }
 
-class renderProp{
+class RenderProp{
     constructor(value,id){
         var ref = this;
-        if(value instanceof renderProp) ref.value = value.get();
+        if(value instanceof RenderProp) ref.value = value.get();
         ref.__renders = [];
         ref.__value = value;
         ref.id = id;
@@ -129,11 +133,11 @@ class renderProp{
     }
 }
 
-class renderList{
+class RenderList{
     constructor(values){
         var ref = this;
         var id= 0;
-        ref.__values = values.map(x=>new renderProp(x,id++));
+        ref.__values = values.map(x=>new RenderProp(x,id++));
         ref.__renders = [];
 
         ref.at = function(index){
@@ -185,7 +189,7 @@ class renderList{
 
         ref.insertAt = function(index,value){
             var currentProp = ref.__values[index];
-            var newProp = new renderProp(value,id++);
+            var newProp = new RenderProp(value,id++);
             if(currentProp){
                 ref.__renders.forEach(x=>{
                     var currentRender = getRender(currentProp,x.parent);
@@ -226,13 +230,13 @@ class renderList{
 //autocomplete fix for vscode 26
 //todo remove renderfunctions from the renderlist that are no longer viable 13
 //todo stop user from using multiple lists per parent 5
-//todo renderProp attributes/values 5
+//todo RenderProp attributes/values 5
 //todo "footer" prop for lists. 3
 //loose focus update. 2
 //todo add all html elements 5
 //todo turn classes into methods 3
 //todo add better error for handing in null instead of renderObject
-//todo add way to parse out all renderProps/lists and turn it back into a simple object
+//todo add way to parse out all RenderProps/lists and turn it back into a simple object
 //TODO make ['string'] work.
 //todo capitalize object names
 //todo make trace work on both front and backend
@@ -241,8 +245,8 @@ class renderList{
 
 
 
-//bugs the render on a renderList does not remove existing element.  vvvv broken code vvvv
-// var state = new renderProp({data:null})
+//bugs the render on a RenderList does not remove existing element.  vvvv broken code vvvv
+// var state = new RenderProp({data:null})
 
 // function app(root){
 //     trace(this);
@@ -259,7 +263,7 @@ class renderList{
 // //fetch('/api/test').then(x=>console.log(x))
 // makeCall('getall',data=>{
 //     state.update(x=>{
-//         x.data = new renderList(JSON.parse(data))
+//         x.data = new RenderList(JSON.parse(data))
 //         return x;
 //     })
 // })

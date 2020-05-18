@@ -1,4 +1,5 @@
 var demos = [
+    test,
     intro,
     intoContinued,
     bindingDemo,
@@ -8,7 +9,7 @@ var demos = [
 ]
 
 function app(root){
-    var state = new renderProp(0);
+    var state = new RenderProp(0);
     trace(this);
     div([
         state.display(x=>{
@@ -26,7 +27,7 @@ app(_root)
 
 function listDemo(){
     var index = 4;
-    var list = new renderList([1,2,3])
+    var list = new RenderList([1,2,3])
     trace(this);
     return div([
         h3('Here is the most complicated part... lists'),
@@ -78,7 +79,7 @@ function makeBigInEfficientGraph(){
 
     trace(this);
 
-    var gr = new renderProp(graph)
+    var gr = new RenderProp(graph)
     return div({class:'blue'},[
         h5('here I made my tool make 10k elements. if you click one it will increment the number (you may notice a problem)'),
         gr.display(
@@ -99,7 +100,7 @@ function makeBigEfficientGraph(root){
     for(var i = 0; i < graphSize; i++){
         var t = [];
         for(var j = 0; j < graphSize; j++){
-            t.push(new renderProp(i*100+j))
+            t.push(new RenderProp(i*100+j))
         }
         graph.push(t);
     }
@@ -118,7 +119,7 @@ function makeBigEfficientGraph(root){
 }
 
 function bindingDemo(){
-    var state = new renderProp('This is a demo of how a single render prop can update many elements at once');
+    var state = new RenderProp('This is a demo of how a single render prop can update many elements at once');
     trace(this);
     return div([
         state.display(x=>h1(x)),
@@ -186,6 +187,10 @@ function intoContinued(){
         h3('this will actually attach the element to the page. it will insert a div with and h1 into the element with "some-id"'),
         h3('it does this by creating an element, then recursively calling each trace-element\'s render function, passing its element in as the parameter. This will recursively append each element to the one above it'),
     ])
+}
+
+function test(){
+    return div([h1([false]),h1([0])])
 }
 
 //this should run through every type trace can handle eventually.
