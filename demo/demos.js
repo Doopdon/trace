@@ -44,7 +44,7 @@ function listDemo(){
         h3('Here is a RenderList, it is "displayed" 3 times in 3 different ways'),
         h5('This one displays each number in a different color depending on its remainder when dived by 3 (just so you can see class updates)'),
         div([
-            list.display(x=>h1({class:['red-text','green-text','blue-text'][x%3]},x)),
+            list.display((x,li)=>h1({class:li.atr(x=>['red-text','green-text','blue-text'][x%3])},x)),
         ]),
 
         div([
@@ -214,14 +214,10 @@ function intoContinued(){
 //this should run through every type trace can handle eventually.
 function test(){
     trace(this)
-    var list  = new RenderList([1,2,3,4])
-    return div([
-        div([
-            list.ufDisplay((x,li)=>textarea({onkeyup:e=>li.set(e.target.value)},x))
-        ]),
-        div([
-            list.ufDisplay(x=>h1(x))
-        ])
-    ])
+    var o = new RenderProp(3)
+    setTimeout(()=>{o.set(5)},3000)
+    
+    return o.display(x=>h1({class:o.atr(x=>['red','green','blue'][x%3])},x))
+
 }
 

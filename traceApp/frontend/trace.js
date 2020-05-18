@@ -78,6 +78,7 @@ function trace(context){
 
             function setAttributes(element,attributes){
                 Object.keys(attributes).forEach(function(key){
+                    if(attributes[key].genAtr) return attributes[key].genAtr(key,element);
                     (typeof attributes[key] == "function") && 
                     (element[key] = attributes[key]) || 
                     element.setAttribute(key,attributes[key])
@@ -131,6 +132,26 @@ class RenderProp{
                 }
             }
         }
+
+        ref.atr = function(renderFunction){
+            return new (function(){
+                var atrObj = this;    
+                atrObj.renderFunction =  renderFunction;
+                atrObj.genAtr = function(atrName,elem){
+                    elem.setAttribute(atrName,renderFunction(ref.__value))
+                }
+            })()
+        }
+
+        ref.getValue = function(){
+            var output = {};
+            Object.keys(ref.__value).forEach(key=>{
+                var val = ref.__value[key];
+                val = val.getValue && val.getValue() || val;
+                output[key] = val;
+            })
+            return output;
+        }
     }
 }
 
@@ -148,30 +169,17 @@ class RenderListItem extends RenderProp{
 class RenderList{
     constructor(values){
         var ref = this;
-        var id= 0;
-        ref.__values = values.map(x=>new RenderListItem(x,id++,getUtils));//here111
+        var idItr= 0;
+        ref.__values = values.map(x=>new RenderListItem(x,idItr++,getUtils));//here111
         ref.__renders = [];
 
-        ref.at = function(index){
-            return ref.__values[index];
-        }
-        ref.length = function(){
-            return ref.values.length;
-        }
+        ref.at = function(index){return ref.__values[index];}
+        ref.getLength = function(){return ref.values.length;}
 
-        ref.pop = function(){
-            return ref.removeAt(ref.__values.length-1)
-        };
-        ref.shift = function(){
-            return ref.removeAt(0);
-        };
-        
-        ref.prepend = function(value){
-            ref.insertAt(0,value)
-        };
-        ref.append = function(value){
-            ref.insertAt(ref.__values.length,value)
-        }
+        ref.pop = function(){return ref.removeAt(ref.__values.length-1)};
+        ref.shift = function(){return ref.removeAt(0);};
+        ref.prepend = function(value){ref.insertAt(0,value)};
+        ref.append = function(value){ref.insertAt(ref.__values.length,value)}
 
         function getIndexFromId(id){
             var index;
@@ -187,7 +195,7 @@ class RenderList{
 
         ref.insertAt = function(index,value){
             var currentProp = ref.__values[index];
-            var newProp = new RenderProp(value,id++);
+            var newProp = new RenderListItem(value,idItr++,getUtils);
             if(currentProp){
                 ref.__renders.forEach(x=>{
                     var currentRender = getRender(currentProp,x.parent);
@@ -214,6 +222,7 @@ class RenderList{
             ref.__values.splice(index,1);
             return rProp.get();
         }
+
         ref.display = function(renderFunction){return bind(renderFunction,false)}
         ref.ufDisplay = function(renderFunction){return bind(renderFunction,true)}
         function bind(renderFunction,uf){
@@ -233,12 +242,11 @@ class RenderList{
 //todo remove renderfunctions from the renderlist that are no longer viable 13
 //todo stop user from using multiple lists per parent 5
 //todo RenderProp attributes/values 5
-//todo "footer" prop for lists. 3
+//todo "footer" prop for lists. 5
 //loose focus update. 2
-//todo turn classes into methods 3
-//todo add way to parse out all RenderProps/lists and turn it back into a simple object
 //todo make trace work on both front and backend
 //todo make trace handle onkeypress events.
-//todo rename it it "gium" or "vestigium" or "nishaan" or "rastro" or "Spur" something
+//todo rename it it "gium" or "vestigium" or "nishaan" or "rastro" or "Spur" or something
 //todo revisit renderprop mapping "here111"
+//todo make atr(x=>x) and update(x=>x) default
 
