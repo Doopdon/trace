@@ -249,4 +249,6 @@ class RenderList{
 //todo rename it it "gium" or "vestigium" or "nishaan" or "rastro" or "Spur" or something
 //todo revisit renderprop mapping "here111"
 //todo make atr(x=>x) and update(x=>x) default
+//todo make an atr demo
+//todo make an atrInnerHtml thing
 
