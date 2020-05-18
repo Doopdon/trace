@@ -1,9 +1,8 @@
 function trace(context){
     context = context || {};
-    var allowedTypes = "string,number,boolean".split(',');
-    
+    var allowedTypes = "string,number,boolean".split(','); 
     var elemTypes = 
-    "a,abbr,acronym,address,applet,area,article,aside,audio,b,base,basefont,bb,bdo,big,blockquote,body,br,button,canvas,caption,center,cite,code,col,colgroup,command,datagrid,datalist,dd,del,details,dfn,dialog,dir,div,dl,dt,em,embed,eventsource,fieldset,figcaption,figure,font,footer,form,frame,frameset,h1,h2,h3,h4,h5,h6,,head,header,hgroup,hr,html,i,iframe,img,input,ins,isindex,kbd,keygen,label,legend,li,link,map,mark,menu,meta,meter,nav,noframes,noscript,object,ol,optgroup,option,output,p,param,pre,progress,q,rp,rt,ruby,s,samp,script,section,select,small,source,span,strike,strong,style,sub,sup,table,tbody,td,textarea,tfoot,th,thead,time,title,tr,track,tt,u,ul,var,video,wbr"
+    "a,abbr,acronym,address,applet,area,article,aside,audio,b,base,basefont,bb,bdo,big,blockquote,body,br,button,canvas,caption,center,cite,code,col,colgroup,command,datagrid,datalist,dd,del,details,dfn,dialog,dir,div,dl,dt,em,embed,eventsource,fieldset,figcaption,figure,font,footer,form,frame,frameset,h1,h2,h3,h4,h5,h6,head,header,hgroup,hr,html,i,iframe,img,input,ins,isindex,kbd,keygen,label,legend,li,link,map,mark,menu,meta,meter,nav,noframes,noscript,object,ol,optgroup,option,output,p,param,pre,progress,q,rp,rt,ruby,s,samp,script,section,select,small,source,span,strike,strong,style,sub,sup,table,tbody,td,textarea,tfoot,th,thead,time,title,tr,track,tt,u,ul,var,video,wbr"
     .split(',');
     
     context.blank = function(){return document.createElement('div')};
@@ -12,7 +11,8 @@ function trace(context){
             if(extra) throw "RenderObject cannot have more than 2 parameters"
             return generateElement(elemName,param1,param2)}
     })
-    
+    return context
+
     function generateElement(elemType,param1,param2){
         var params = processParams(param1,param2)
         return new renderObject(params,elemType)
@@ -105,7 +105,7 @@ class RenderProp{
             ref.__renders = ref.__renders.filter(function(x){
                 if(!document.body.contains(x.elem)) return false;
                 if(x.unFoc && (x.elem.contains(document.activeElement) || x.elem === document.activeElement)) return true;
-                var renderObj = x.renderFunction(ref.__value,utils)
+                var renderObj = x.renderFunction(ref.__value,ref)
                 var newElem = renderObj.render(x.parent,x.elem)
                 x.elem =  newElem;
                 return true;
@@ -116,17 +116,13 @@ class RenderProp{
                 x.parent.removeChild(x.elem);
             })
         }
-        ref.ufDisplay = function(renderFunction,utl){
-            return bind(renderFunction,utl,true)
-        }
-        ref.display = function(renderFunction){
-            return bind(renderFunction,false)
-        }
 
+        ref.ufDisplay = function(renderFunction,utl){return bind(renderFunction,utl,true)}
+        ref.display = function(renderFunction){return bind(renderFunction,false)}
         function bind(renderFunction,unFoc){
             return {
                 render:function(parent){
-                    var rObj = renderFunction(ref.__value,utils);
+                    var rObj = renderFunction(ref.__value,ref);
                     if(!(rObj && rObj.render))
                         throw "display function did not return a RenderObject. it returned: "+JSON.stringify(rObj)
                     var elem = rObj.render(parent);
@@ -139,19 +135,13 @@ class RenderProp{
 }
 
 class RenderListItem extends RenderProp{
-    constructor(value,id){
-        super(value);
-        var ref = this;
-        ref.utils = null;
-        ref.id = id;
-        var baseDisplay = this.display;
-        ref.display = function(renderFunction,utils){
-            ref.utils = utils
-            return baseDisplay(renderFunction)
-        }
+    constructor(value,id,getUtils){
+        return RenderListItem.generateFromRenderProp(new RenderProp(value),id,getUtils)
     }
-    static generateFromRenderProp(){
-        return {};
+    static generateFromRenderProp(renderProp,id,getUtils){
+        renderProp.utils = getUtils(renderProp);
+        renderProp.id = id;
+        return renderProp
     } 
 }
 
@@ -159,7 +149,7 @@ class RenderList{
     constructor(values){
         var ref = this;
         var id= 0;
-        ref.__values = values.map(x=>new RenderListItem(x,id++));//here111
+        ref.__values = values.map(x=>new RenderListItem(x,id++,getUtils));//here111
         ref.__renders = [];
 
         ref.at = function(index){
@@ -190,24 +180,9 @@ class RenderList{
         }
 
         function getUtils(rProp){
-            return{
-                rProp,
-                insertBefore:function(value){
-                    ref.insertAt(getIndexFromId(rProp.id),value)
-                },
-                delete:function(){
-                    return ref.removeAt(getIndexFromId(rProp.id))
-                },
-                insertAfter:function(value){
-                    ref.insertAt(getIndexFromId(rProp.id)+1,value)
-                },
-                getIndex:function(){
-                    return getIndexFromId(rProp.id);
-                },
-                val:function(){
-                    return ref.at(getIndexFromId(rProp.id))
-                },
-            }
+            rProp.delete = function(){return ref.removeAt(getIndexFromId(rProp.id))}
+            rProp.getIndex = function(){return getIndexFromId(rProp.id)}
+            rProp.insertAt = function(index,value){return ref.insertAt(index,value)}
         }
 
         ref.insertAt = function(index,value){
@@ -239,15 +214,15 @@ class RenderList{
             ref.__values.splice(index,1);
             return rProp.get();
         }
-        ref.display = function(renderFunction){
+        ref.display = function(renderFunction){return bind(renderFunction,false)}
+        ref.ufDisplay = function(renderFunction){return bind(renderFunction,true)}
+        function bind(renderFunction,uf){
             return {render:function(parent,element){
                 element && parent.removeChild(element);
                 ref.__renders.push({renderFunction,parent});
-                ref.__values.forEach(x=>x.display(renderFunction,getUtils(x)).render(parent))
+                var functionName = uf && 'ufDisplay' || 'display'
+                ref.__values.forEach(x=>x[functionName](renderFunction,x).render(parent))
             }}
-        }
-        ref.ufDisplay = function(renderFunction){
-            throw "not done yet" //here222
         }
     }
 }
@@ -266,5 +241,4 @@ class RenderList{
 //todo make trace handle onkeypress events.
 //todo rename it it "gium" or "vestigium" or "nishaan" or "rastro" or "Spur" something
 //todo revisit renderprop mapping "here111"
-//todo make renderprop object for lists that extends a regular renderprop
-//todo finish ufDisplay for lists.
+

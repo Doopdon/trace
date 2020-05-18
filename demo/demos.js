@@ -1,11 +1,12 @@
 var demos = [
-   // test,
-    listDemo,
+    test,
+    
     intro,
     intoContinued,
     bindingDemo,
     makeBigInEfficientGraph,
     makeBigEfficientGraph,
+    listDemo,
    
 ]
 
@@ -52,17 +53,17 @@ function listDemo(){
             list.display(x=>h5(x)),
         ]),
 
-        // h5('Here you can see that every list item is given "utilities", these include delete, insert-before, insert-after, get-current-index, and edit. the edit just increments the number'),
-        // div([
-        //     list.display((x,u)=>div({class:['red','green','blue'][x%3]},[
-        //         label(x),
-        //         button({onclick:()=>u.insertBefore(index++)},'insert before'),
-        //         button({onclick:()=>u.insertAfter(index++)},'insert after'),
-        //         button({onclick:u.delete},'delete'),
-        //         button({onclick:()=>alert(u.getIndex())},'getIndex'),
-        //         button({onclick:()=>u.rProp.update(x=>x+1)},'edit'),
-        //     ]))
-        // ]),
+        h5('Here you can see that every list item is given "utilities", these include delete, insert-before, insert-after, get-current-index, and edit. the edit just increments the number'),
+        div([
+            list.display((x,li)=>div({class:['red','green','blue'][x%3]},[
+                label(x),
+                button({onclick:()=>li.insertAt(li.getIndex(),(index++))},'insert before'),
+                button({onclick:()=>li.insertAt(li.getIndex()+1,(index++))},'insert after'),
+                button({onclick:li.delete},'delete'),
+                button({onclick:()=>alert(li.getIndex())},'getIndex'),
+                button({onclick:()=>li.update(x=>x+1)},'edit'),
+            ]))
+        ]),
         
     ]) 
 }
@@ -190,31 +191,37 @@ function intoContinued(){
     ])
 }
 
-function test(){
-    var p = new RenderProp({})
-    var s = new RenderList([1,2,3,4]);
-    setTimeout(()=>{
-        p.set({data:s});
-        console.log(p)
-    },1000);
-    return div([
-        p.display(x=>{
-            if(!x.data) return h1('loading');
-            return x.data.display(x=>h1(x))
-        })
-    ])
+// function test(){
+//     var p = new RenderProp({})
+//     var s = new RenderList([1,2,3,4]);
+//     setTimeout(()=>{
+//         p.set({data:s});
+//         console.log(p)
+//     },1000);
+//     return div([
+//         p.display(x=>{
+//             if(!x.data) return h1('loading');
+//             return x.data.display(x=>h1(x))
+//         })
+//     ])
     
-}
+// }
 
-function testComp(word){
-    return h1(word)
-}
+// function testComp(word){
+//     return h1(word)
+// }
 
 //this should run through every type trace can handle eventually.
-function types(){
+function test(){
     trace(this)
+    var list  = new RenderList([1,2,3,4])
     return div([
-        h1('things').render(blank())
+        div([
+            list.ufDisplay((x,li)=>textarea({onkeyup:e=>li.set(e.target.value)},x))
+        ]),
+        div([
+            list.ufDisplay(x=>h1(x))
+        ])
     ])
 }
 
