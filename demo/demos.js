@@ -1,8 +1,9 @@
 var demos = [
     intro,
+    intoContinued,
     bindingDemo,
-    makeBigGraphInEfficient,
-    makeEfficientGraph,
+    makeBigInEfficientGraph,
+    makeBigEfficientGraph,
     listDemo,
 ]
 
@@ -29,7 +30,7 @@ function listDemo(){
     trace(this);
     return div([
         h3('Here is the most complicated part... lists'),
-        h5('lists need to add, delete and update items without re-rendering. this was hard to do but the code is simple (I think)'),
+        h5('Lists need to add, delete and update items without re-rendering. this was hard to do. But the code is simple (I think)'),
         h5('Here are some buttons to changes the list. new items will just be 1+ the last highest number'),
 
         button({onclick:()=>list.append(index++)},'append'),
@@ -37,17 +38,19 @@ function listDemo(){
         button({onclick:()=>list.pop()},'pop'),
         button({onclick:()=>list.shift()},'shift'),
 
+        h3('Here is a RenderList, it is "displayed" 3 times in 3 different ways'),
+        h5('This one displays each number in a different color depending on its remainder when dived by 3 (just so you can see class updates)'),
         div([
-            h2('Here is a RenderList, it is "displayed" 3 times in 3 different ways'),
-            h3('this one displays each number in a different color depending on its remainder when dived by 3 (just so you can see class updates)'),
-            list.display(x=>h3({class:['red-text','green-text','blue-text'][x%3]},x)),
+            list.display(x=>h1({class:['red-text','green-text','blue-text'][x%3]},x)),
         ]),
+
         div([
-            h3('something to mention about lists is they do not replace or remove elements before them'),
-            h3('so it may cause confusion, lists are tricky. best to wrap them in a div if you don\'t want trouble'),
+            h5('something to mention about lists is they do not replace or remove elements before them. this is so table headers are not affected'),
+            h5('so it may cause confusion, lists are tricky. best to wrap them in a div if you don\'t want trouble (room for improvement!)'),
             list.display(x=>h5(x)),
         ]),
 
+        h5('Here you can see that every list item is given "utilities", these include delete, insert-before, insert-after, get-current-index, and edit. the edit just increments the number'),
         div([
             list.display((x,u)=>div({class:['red','green','blue'][x%3]},[
                 label(x),
@@ -62,7 +65,7 @@ function listDemo(){
     ]) 
 }
 
-function makeBigGraphInEfficient(){
+function makeBigInEfficientGraph(){
     var graphSize = 100;
     var graph = []
     for(var i = 0; i < graphSize; i++){
@@ -90,7 +93,7 @@ function makeBigGraphInEfficient(){
     ])
 }
 
-function makeEfficientGraph(root){
+function makeBigEfficientGraph(root){
     var graphSize = 100;
     var graph = []
     for(var i = 0; i < graphSize; i++){
@@ -103,7 +106,7 @@ function makeEfficientGraph(root){
 
     trace(this);
     return div({class:'red'},[
-        h5('the problem is that the whole page re-renders when you click an element, here it is again using a "RenderProp" for each element'),
+        h5('the problem is that the whole page re-renders when you click an element, here it is again using a "RenderProp" for each element. click an element again, it is now practically instantaneous'),
         table([
             graph.map((a)=>tr(
                 a.map(rProp=>
@@ -154,6 +157,38 @@ function intro(){
     ])
 }
 
+function intoContinued(){
+    trace(this);
+    return div([
+        h3('to get started you need to add the code <trace(this)> to the top of your function'),
+        br(),
+        h3('this adds a whole slue of 3 letter functions to your function without polluting the global scope'),
+        h5({class:'blue-text'},'you can also use trace(window), if you don\'t care about the global scope, or you can use --var traceFunctions = trace()-- and use --traceFunctions.div()-- if you want'),
+        br(),
+        h3('now take a look at a simple trace-"element"'),
+        h1('div({},[])'),
+        h3('it is simply a function that takes 2 parameters. an object, and an array'),
+        h3('the object holds all the attributes for the element ex:{class:"red"}, this will set the class of the element to "red". This also works for "id", "custom-attribute", and even things like "onclick" events, you can simply use --{onclick:function(){alert("hey")}}--'),
+        h3('the second param holds a list of all the other trace-elements. so a div might have 2 h1\'s in it ex: div({},[h1("1"),h1("2")])'),
+        h3('the elements in the array are added to the element as children in the order given'),
+        br(),
+        h3('now lets take a look at the --h1("1")-- trace-element. notice how it didn\'t have 2 params and instead of an array it just has a string?'),
+        h3('This is because if an array is not given, instead a string is given (or boolean or number), trace will set the innerHTML to the given value.'),
+        h3('trace will also infer if you are handing it attributes or not. so if you just call div like so: <div([h1("1"),h1("2")])> it will infer that it does not have any attributes and will just set the children'),
+        h3('this also works for attributes: --div({class:"red"})--, this example has no children but a class of "red"'),
+        br(),
+        h3('Also trace will iterate through arrays recursively. ex --div([[h1("1"),[h1("2"),h1("3")],h1("4")],[h1("5"),h1("6")]])--. This will show up as a div with "1,2,3,4,5,6" in it'),
+        h3('this is done so you can add arrays together easily, just put them both in a parent array. it also stops annoying issues like this --div([arr.map(x=>h1(x))])-- the div is given an array, and inside is the "map" function which returns another array.'),
+        h3('if it didn\'t recursively iterate through the arrays you would get an error.'),
+        br(),
+        h3('lastly you we need to call the "render" function it takes an element that will be the parent, and it will return the created element ex:'),
+        h1('div([h1("this is a trace app")]).render(document.getElementById("some-id"))'),
+        h3('this will actually attach the element to the page. it will insert a div with and h1 into the element with "some-id"'),
+        h3('it does this by creating an element, then recursively calling each trace-element\'s render function, passing its element in as the parameter. This will recursively append each element to the one above it'),
+    ])
+}
+
+//this should run through every type trace can handle eventually.
 function types(){
     trace(this)
     return div([

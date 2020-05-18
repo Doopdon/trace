@@ -237,6 +237,7 @@ class renderList{
 //todo capitalize object names
 //todo make trace work on both front and backend
 //todo make trace handle onkeypress events.
+//todo handle p(["some stuff",span("more stuff"),"continuing with stuff"])
 
 
 
