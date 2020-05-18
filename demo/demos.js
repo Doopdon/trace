@@ -190,7 +190,23 @@ function intoContinued(){
 }
 
 function test(){
-    return div([h1([false]),h1([0])])
+    var p = new RenderProp({})
+    var s = new RenderList([1,2,3,4]);
+    setTimeout(()=>{
+        p.set({data:s});
+        console.log(p)
+    },1000);
+    return div([
+        p.display(x=>{
+            if(!x.data) return h1('loading');
+            return x.data.display(x=>h1(x))
+        })
+    ])
+    
+}
+
+function testComp(word){
+    return h1(word)
 }
 
 //this should run through every type trace can handle eventually.

@@ -103,7 +103,8 @@ class RenderProp{
             ref.__renders = ref.__renders.filter(function(x){
                 if(!document.body.contains(x.elem)) return false;
                 if(x.unFoc && (x.elem.contains(document.activeElement) || x.elem === document.activeElement)) return true;
-                var newElem = x.renderFunction(ref.__value,utils).render(x.parent,x.elem)
+                var renderObj = x.renderFunction(ref.__value,utils)
+                var newElem = renderObj.render(x.parent,x.elem)
                 x.elem =  newElem;
                 return true;
             })
@@ -124,7 +125,10 @@ class RenderProp{
             utils = utl;
             return {
                 render:function(parent){
-                    var elem = renderFunction(ref.__value,utils).render(parent);
+                    var rObj = renderFunction(ref.__value,utils);
+                    if(!(rObj && rObj.render))
+                        throw "display function did not return render object. it returned :"+JSON.stringify(rObj)
+                    var elem = rObj.render(parent);
                     ref.__renders.push({renderFunction,elem,parent,unFoc})
                     return elem;
                 }
@@ -217,7 +221,8 @@ class RenderList{
             return rProp.get();
         }
         ref.display = function(renderFunction){
-            return {render:function(parent){
+            return {render:function(parent,element){
+                element && parent.removeChild(element);
                 ref.__renders.push({renderFunction,parent});
                 ref.__values.forEach(x=>x.display(renderFunction,getUtils(x)).render(parent))
             }}
@@ -235,53 +240,10 @@ class RenderList{
 //loose focus update. 2
 //todo add all html elements 5
 //todo turn classes into methods 3
-//todo add better error for handing in null instead of renderObject
 //todo add way to parse out all RenderProps/lists and turn it back into a simple object
-//TODO make ['string'] work.
-//todo capitalize object names
 //todo make trace work on both front and backend
 //todo make trace handle onkeypress events.
-//todo handle p(["some stuff",span("more stuff"),"continuing with stuff"])
 
-
-
-//bugs the render on a RenderList does not remove existing element.  vvvv broken code vvvv
-// var state = new RenderProp({data:null})
-
-// function app(root){
-//     trace(this);
-//     div([
-//         state.display(x=>{
-//             if(!x.data) 
-//                 return h1('Loading...')
-//             let y = x.data.display(x=>h1('item'))
-//             return y;
-//         })
-//     ]).render(root)
-// }
-
-// //fetch('/api/test').then(x=>console.log(x))
-// makeCall('getall',data=>{
-//     state.update(x=>{
-//         x.data = new RenderList(JSON.parse(data))
-//         return x;
-//     })
-// })
-// var _root = document.getElementById('root');
-// app(_root)
-
-// function makeCall(route,callback) {
-//     var xhttp = new XMLHttpRequest();
-//     xhttp.onreadystatechange = function() {
-//         if (this.readyState == 4 && this.status == 200)
-//             callback(this.response)
-//     };
-//     xhttp.open("GET", "api/"+route, true);
-//     xhttp.send();
-// }
-
-//needs to take renderObject alone 
-//td([coolButton('buy')]) vs td(coolButton('buy'))
 
 
 
