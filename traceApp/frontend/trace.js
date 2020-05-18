@@ -94,7 +94,6 @@ class RenderProp{
         if(value instanceof RenderProp) ref.value = value.get();
         ref.__renders = [];
         ref.__value = value;
-        var utils;
   
         ref.update = function(updateFunction){
             ref.set(updateFunction(ref.get()))
@@ -104,7 +103,9 @@ class RenderProp{
             ref.__value =  newValue;
             ref.__value = newValue;
             ref.__renders = ref.__renders.filter(function(x){
-                if(!document.body.contains(x.elem)) return false;
+                if(!document.body.contains(x.elem)) {
+                    ref.onDeleteRF && ref.onDeleteRF(x.renderFunction)
+                    return false;}
                 if(x.unFoc && (x.elem.contains(document.activeElement) || x.elem === document.activeElement)) return true;
                 var renderObj = x.renderFunction(ref.__value,ref)
                 var newElem = renderObj.render(x.parent,x.elem)
@@ -156,12 +157,13 @@ class RenderProp{
 }
 
 class RenderListItem extends RenderProp{
-    constructor(value,id,getUtils){
-        return RenderListItem.generateFromRenderProp(new RenderProp(value),id,getUtils)
+    constructor(value,id,getUtils,onDeleteRF){
+        return RenderListItem.generateFromRenderProp(new RenderProp(value),id,getUtils,onDeleteRF)
     }
-    static generateFromRenderProp(renderProp,id,getUtils){
+    static generateFromRenderProp(renderProp,id,getUtils,onDeleteRF){
         renderProp.utils = getUtils(renderProp);
         renderProp.id = id;
+        renderProp.onDeleteRF = onDeleteRF;
         return renderProp
     } 
 }
@@ -170,7 +172,7 @@ class RenderList{
     constructor(values){
         var ref = this;
         var idItr= 0;
-        ref.__values = values.map(x=>new RenderListItem(x,idItr++,getUtils));//here111
+        ref.__values = values.map(x=>new RenderListItem(x,idItr++,getUtils,deleteRF));//here111
         ref.__renders = [];
 
         ref.at = function(index){return ref.__values[index];}
@@ -193,9 +195,13 @@ class RenderList{
             rProp.insertAt = function(index,value){return ref.insertAt(index,value)}
         }
 
+        function deleteRF(renderFunction){
+            ref.__renders.filter(function(x){x != renderFunction})
+        }
+
         ref.insertAt = function(index,value){
             var currentProp = ref.__values[index];
-            var newProp = new RenderListItem(value,idItr++,getUtils);
+            var newProp = new RenderListItem(value,idItr++,getUtils,deleteRF);
             if(currentProp){
                 ref.__renders.forEach(x=>{
                     var currentRender = getRender(currentProp,x.parent);
@@ -239,7 +245,6 @@ class RenderList{
 //IT AINT DONE YET
 
 //autocomplete fix for vscode 26
-//todo remove renderfunctions from the renderlist that are no longer viable 13
 //todo stop user from using multiple lists per parent 5
 //todo RenderProp attributes/values 5
 //todo "footer" prop for lists. 5
