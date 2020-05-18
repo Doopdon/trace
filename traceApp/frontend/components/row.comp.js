@@ -24,7 +24,7 @@ function rowComp(data,util){
                 var qty = quantityElem.element.value;//you can get the element from the renderObject and get whatever info you need
                 updateRecord(
                     {name:data.name.get(),quantity:qty,id:data.id,numUpdates:data.numUpdates},//TODO i need to make an easier way to get data out
-                    x=>util.val().set(new DataForRendering(x))
+                    x=>util.rProp.set(new DataForRendering(x))
                 )}
             )
         ]),

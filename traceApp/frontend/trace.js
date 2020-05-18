@@ -9,11 +9,11 @@ function trace(context){
     context.blank = function(){return document.createElement('div')};
     elemTypes.forEach(function(elemName){
         context[elemName] = function(param1,param2,extra){
-            if(extra) throw "RenderObject cannot take more than 2 parameters"
+            if(extra) throw "RenderObject cannot have more than 2 parameters"
             return generateElement(elemName,param1,param2)}
     })
     
-    function generateElement(elemType,param1,param2,extra){
+    function generateElement(elemType,param1,param2){
         var params = processParams(param1,param2)
         return new renderObject(params,elemType)
 
@@ -88,12 +88,11 @@ function trace(context){
 }
 
 class RenderProp{
-    constructor(value,id){
+    constructor(value){
         var ref = this;
         if(value instanceof RenderProp) ref.value = value.get();
         ref.__renders = [];
         ref.__value = value;
-        ref.id = id;
         var utils;
   
         ref.update = function(updateFunction){
@@ -120,17 +119,16 @@ class RenderProp{
         ref.ufDisplay = function(renderFunction,utl){
             return bind(renderFunction,utl,true)
         }
-        ref.display = function(renderFunction,utl){
-            return bind(renderFunction,utl,false)
+        ref.display = function(renderFunction){
+            return bind(renderFunction,false)
         }
 
-        function bind(renderFunction,utl,unFoc){
-            utils = utl;
+        function bind(renderFunction,unFoc){
             return {
                 render:function(parent){
                     var rObj = renderFunction(ref.__value,utils);
                     if(!(rObj && rObj.render))
-                        throw "display function did not return render object. it returned :"+JSON.stringify(rObj)
+                        throw "display function did not return a RenderObject. it returned: "+JSON.stringify(rObj)
                     var elem = rObj.render(parent);
                     ref.__renders.push({renderFunction,elem,parent,unFoc})
                     return elem;
@@ -140,11 +138,28 @@ class RenderProp{
     }
 }
 
+class RenderListItem extends RenderProp{
+    constructor(value,id){
+        super(value);
+        var ref = this;
+        ref.utils = null;
+        ref.id = id;
+        var baseDisplay = this.display;
+        ref.display = function(renderFunction,utils){
+            ref.utils = utils
+            return baseDisplay(renderFunction)
+        }
+    }
+    static generateFromRenderProp(){
+        return {};
+    } 
+}
+
 class RenderList{
     constructor(values){
         var ref = this;
         var id= 0;
-        ref.__values = values.map(x=>new RenderProp(x,id++));
+        ref.__values = values.map(x=>new RenderListItem(x,id++));//here111
         ref.__renders = [];
 
         ref.at = function(index){
@@ -155,10 +170,10 @@ class RenderList{
         }
 
         ref.pop = function(){
-            return ref.deleteAt(ref.__values.length-1)
+            return ref.removeAt(ref.__values.length-1)
         };
         ref.shift = function(){
-            return ref.deleteAt(0);
+            return ref.removeAt(0);
         };
         
         ref.prepend = function(value){
@@ -176,11 +191,12 @@ class RenderList{
 
         function getUtils(rProp){
             return{
+                rProp,
                 insertBefore:function(value){
                     ref.insertAt(getIndexFromId(rProp.id),value)
                 },
                 delete:function(){
-                    return ref.deleteAt(getIndexFromId(rProp.id))
+                    return ref.removeAt(getIndexFromId(rProp.id))
                 },
                 insertAfter:function(value){
                     ref.insertAt(getIndexFromId(rProp.id)+1,value)
@@ -216,7 +232,7 @@ class RenderList{
                 return rProp.__renders.find(x=> x.parent == parent)
             }
         }
-        ref.deleteAt = function(index){
+        ref.removeAt = function(index){
             var rProp = ref.__values[index];
             if(!rProp) return null;
             rProp.deleteAll();
@@ -230,6 +246,9 @@ class RenderList{
                 ref.__values.forEach(x=>x.display(renderFunction,getUtils(x)).render(parent))
             }}
         }
+        ref.ufDisplay = function(renderFunction){
+            throw "not done yet" //here222
+        }
     }
 }
 
@@ -241,15 +260,11 @@ class RenderList{
 //todo RenderProp attributes/values 5
 //todo "footer" prop for lists. 3
 //loose focus update. 2
-//todo add all html elements 5
 //todo turn classes into methods 3
 //todo add way to parse out all RenderProps/lists and turn it back into a simple object
 //todo make trace work on both front and backend
 //todo make trace handle onkeypress events.
 //todo rename it it "gium" or "vestigium" or "nishaan" or "rastro" or "Spur" something
-
-
-
-
-
-
+//todo revisit renderprop mapping "here111"
+//todo make renderprop object for lists that extends a regular renderprop
+//todo finish ufDisplay for lists.

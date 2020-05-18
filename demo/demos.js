@@ -1,11 +1,12 @@
 var demos = [
    // test,
+    listDemo,
     intro,
     intoContinued,
     bindingDemo,
     makeBigInEfficientGraph,
     makeBigEfficientGraph,
-    listDemo,
+   
 ]
 
 function app(root){
@@ -51,17 +52,17 @@ function listDemo(){
             list.display(x=>h5(x)),
         ]),
 
-        h5('Here you can see that every list item is given "utilities", these include delete, insert-before, insert-after, get-current-index, and edit. the edit just increments the number'),
-        div([
-            list.display((x,u)=>div({class:['red','green','blue'][x%3]},[
-                label(x),
-                button({onclick:()=>u.insertBefore(index++)},'insert before'),
-                button({onclick:()=>u.insertAfter(index++)},'insert after'),
-                button({onclick:u.delete},'delete'),
-                button({onclick:()=>alert(u.getIndex())},'getIndex'),
-                button({onclick:()=>u.val().update(x=>x+1)},'edit'),
-            ]))
-        ]),
+        // h5('Here you can see that every list item is given "utilities", these include delete, insert-before, insert-after, get-current-index, and edit. the edit just increments the number'),
+        // div([
+        //     list.display((x,u)=>div({class:['red','green','blue'][x%3]},[
+        //         label(x),
+        //         button({onclick:()=>u.insertBefore(index++)},'insert before'),
+        //         button({onclick:()=>u.insertAfter(index++)},'insert after'),
+        //         button({onclick:u.delete},'delete'),
+        //         button({onclick:()=>alert(u.getIndex())},'getIndex'),
+        //         button({onclick:()=>u.rProp.update(x=>x+1)},'edit'),
+        //     ]))
+        // ]),
         
     ]) 
 }
