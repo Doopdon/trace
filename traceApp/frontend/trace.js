@@ -104,7 +104,7 @@ class RenderProp{
         var ref = this;
         if(value instanceof RenderProp) ref.value = value.get();
         ref.__renders = [];
-        ref.__atrRenders = [];
+        atrFunction(ref);
         ref.__value = value;
   
         ref.update = function(updateFunction){
@@ -114,6 +114,7 @@ class RenderProp{
         ref.get = function(){return ref.__value};
         ref.set = function(newValue){
             ref.__value =  newValue;
+            ref.__runAllAtrs();
             ref.__renders = ref.__renders.filter(function(x){
                 if(!document.body.contains(x.elem)) {
                     ref.onDeleteRF && ref.onDeleteRF(x.renderFunction)
@@ -124,12 +125,7 @@ class RenderProp{
                 var newElem = renderObj.render(x.parent,x.elem)
                 x.elem =  newElem;
                 return true;
-            })
-            ref.__atrRenders.filter(function(x){
-                if(!document.body.contains(x.elem)) return false;
-                x.atrRender();
-                return true
-            })
+            })   
         }
         ref.deleteAll = function(){
             ref.__renders.forEach(x=>{
@@ -150,33 +146,6 @@ class RenderProp{
                     return elem;
                 }
             }
-        }
-
-        ref.atr = function(renderFunction){
-            renderFunction =  renderFunction || function(x){return x};
-            return {
-                ruleType:'atrObj',
-                genAtr:function(atrName,elem){
-                    function atrRender(){
-                        if(atrName == 'innerHTML') return elem.innerHTML = renderFunction(ref.__value);
-                        elem.setAttribute(atrName,renderFunction(ref.__value))
-                    }
-                    ref.__atrRenders.push({atrRender,elem});
-                    atrRender();
-                }
-            }
-
-
-            // return new (function(){
-            //     var atrObj = this;    
-            //     atrObj.renderFunction =  renderFunction || (function(x){return x});
-            //     atrObj.ruleType = 'atrObj'
-            //     atrObj.genAtr = function(atrName,elem){
-            //         var atrRender = ()=>{elem.setAttribute(atrName,atrObj.renderFunction(ref.__value))}
-            //         ref.__atrRenders.push({atrRender,elem});
-            //         atrRender();
-            //     }
-            // })()
         }
 
         ref.getValue = function(){
@@ -207,6 +176,7 @@ class RenderList{
     constructor(values){
         var ref = this;
         var idItr= 0;
+        atrFunction(ref);
         ref.__values = values.map(function(x){
             if(x instanceof RenderProp) return RenderListItem.generateFromRenderProp(xidItr++,getUtils,deleteRF)
             return new RenderListItem(x,idItr++,getUtils,deleteRF)
@@ -242,7 +212,7 @@ class RenderList{
             var newProp = new RenderListItem(value,idItr++,getUtils,deleteRF);
             if(currentProp){
                 ref.__renders.forEach(x=>{
-                    var currentRender = getRender(currentProp,x.parent);
+                    var currentRender = currentProp.__renders.find(x=> x.parent == parent)//getRender(currentProp,x.parent);
                     var newElem = newProp.display(x.renderFunction,getUtils(newProp)).render(x.parent)
                     x.parent.insertBefore(newElem,currentRender.elem)
                 })
@@ -254,7 +224,7 @@ class RenderList{
                 })
                 ref.__values.splice(index,0,newProp);
             }
-
+            ref.__runAllAtrs()
             function getRender(rProp,parent){
                 return rProp.__renders.find(x=> x.parent == parent)
             }
@@ -264,6 +234,7 @@ class RenderList{
             if(!rProp) return null;
             rProp.deleteAll();
             ref.__values.splice(index,1);
+            ref.__runAllAtrs()
             return rProp.get();
         }
 
@@ -282,14 +253,37 @@ class RenderList{
     }
 }
 
+function atrFunction(ref){
+    ref.__atrRenders = [];
+    ref.atr = function(renderFunction){
+        renderFunction =  renderFunction || function(x){return x};
+        return {
+            ruleType:'atrObj',
+            genAtr:function(atrName,elem){
+                function atrRender(){
+                    if(atrName == 'innerHTML') return elem.innerHTML = renderFunction(ref.__value || ref.__values,ref);
+                    elem.setAttribute(atrName,renderFunction(ref.__value || ref.__values,ref))
+                }
+                ref.__atrRenders.push({atrRender,elem});
+                atrRender();
+            }
+        }
+    }
+    ref.__runAllAtrs = function(){
+        ref.__atrRenders = ref.__atrRenders.filter(function(x){
+            if(!document.body.contains(x.elem)) return false;
+            x.atrRender();
+            return true
+        })
+    }
+}
+
 //IT AINT DONE YET
 
 //autocomplete fix for vscode 26
 //todo "footer" prop for lists. 5
 //loose focus update. 5
 //todo make trace work on both front and backend 13
-//todo make trace handle onkeypress events. 5
 //todo rename it it "gium" or "vestigium" or "nishaan" or "rastro" or "Spur" or "harch" "kursdom" "layshon"
-//todo add atr to renderList ...ugh
-
+//todo wrap code so it its inaccessible
 

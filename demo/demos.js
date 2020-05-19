@@ -1,5 +1,5 @@
 var demos = [
-   // test,
+    test,
     intro,
     intoContinued,
     bindingDemo,
@@ -252,7 +252,14 @@ function fortyK(){
 }
 
 function test(){
-    var rl = new RenderList([1,2,3,4])
+    var rl = new RenderList([1,'hahah',3,'red'])
     var rp = new RenderProp('red');
-    return h1({class:rp.atr()},[[],rp.atr()])
+    setTimeout(()=>{
+        rl.insertAt(3,'blue')
+        rp.set('blue')
+    }
+    ,1500)
+    //return h1({class:rp.atr((x,y)=>y.__value)},rp.atr())
+    return h1({class:rl.atr((x,y)=> y.__values[3].get())}
+    ,rl.atr(x=>x[3].get()))
 }
