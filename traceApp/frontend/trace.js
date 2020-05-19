@@ -1,5 +1,5 @@
 (function(){
-    "use strict"
+    // "use strict"
     window.trace = function(context){
         context = context || {};
         var allowedTypes = "string,number,boolean".split(','); 
@@ -101,7 +101,7 @@
         }
     }
     window.RenderProp = function(value){
-        var ref = this;
+        var ref = this || {};
         if(value instanceof RenderProp) ref.value = value.get();
         ref.__renders = [];
         atrFunctions(ref);
@@ -151,6 +151,11 @@
                     if(!(rObj && rObj.render))
                         throw "display function did not return a RenderObject. it returned: "+JSON.stringify(rObj)
                     var elem = rObj.render(parent);
+                    if(unFoc) {
+                        elem.addEventListener("onfocusout", function(){
+                            renderFunction(ref.__value,ref).render(parent,elem)
+                        })
+                    }
                     ref.__renders.push({renderFunction,elem,parent,unFoc})
                     return elem;
                 }
@@ -167,7 +172,7 @@
     }
 
     window.RenderList = function(values){
-        var ref = this;
+        var ref = this || {};
         var idItr= 0;
         atrFunctions(ref);
         ref.__values = values.map(function(x){ return makeRenderListItem(x,idItr++,getUtils,deleteRF) });
@@ -283,10 +288,13 @@
 //IT AINT DONE YET
 
 //autocomplete fix for vscode 26
-//loose focus update. 5
 //todo make trace work on both front and backend 13
 //todo rename it it "gium" or "vestigium" or "nishaan" or "rastro" or "Spur" or "harch" "kursdom" "layshon"
 //todo test on IE ughghghg
 //rename render to insertInto
 //html to trace converter
+//addEventListener thing
+//todo remove ufDisplay. its a hack and people should do it themselves. (add it to the widgets)
 //
+//
+//bug "trace(this)" pollutes the global scope
