@@ -120,7 +120,6 @@
                     ref.onDeleteRF && ref.onDeleteRF(x.renderFunction)
                     return false;
                 }
-                if(x.unFoc && x.elem.contains(document.activeElement)) return true;
                 var renderObj = x.renderFunction(ref.__value,ref)
                 var newElem = renderObj.render(x.parent,x.elem)
                 x.elem =  newElem;
@@ -132,8 +131,18 @@
                 x.parent.removeChild(x.elem);
             })
         }
-        ref.ufDisplay = function(renderFunction){return bind(renderFunction,true)}
-        ref.display = function(renderFunction){return bind(renderFunction,false)}
+        ref.display = function(renderFunction){
+            return {
+                render:function(parent){
+                    var rObj = renderFunction(ref.__value,ref);
+                    if(!(rObj && rObj.render))
+                        throw "display function did not return a RenderObject. it returned: "+JSON.stringify(rObj)
+                    var elem = rObj.render(parent);
+                    ref.__renders.push({renderFunction,elem,parent})
+                    return elem;
+                }
+            }
+        }
         ref.getObjValue = function(){
             var output = {};
             Object.keys(ref.__value).forEach(key=>{
@@ -144,23 +153,6 @@
             return output;
         }
         return ref;
-        function bind(renderFunction,unFoc){
-            return {
-                render:function(parent){
-                    var rObj = renderFunction(ref.__value,ref);
-                    if(!(rObj && rObj.render))
-                        throw "display function did not return a RenderObject. it returned: "+JSON.stringify(rObj)
-                    var elem = rObj.render(parent);
-                    if(unFoc) {
-                        elem.addEventListener("onfocusout", function(){
-                            renderFunction(ref.__value,ref).render(parent,elem)
-                        })
-                    }
-                    ref.__renders.push({renderFunction,elem,parent,unFoc})
-                    return elem;
-                }
-            }
-        }
     }
 
     function makeRenderListItem(renderProp,id,getUtils,onDeleteRF){
@@ -214,11 +206,24 @@
             ref.__runAllAtrFunctions()
             return rProp.get();
         }
-
-        ref.display = function(renderFunction){return bind(renderFunction,false)}
-        ref.ufDisplay = function(renderFunction){return bind(renderFunction,true)}
         ref.getObjValue = function(){
             return ref.__values.map(function(x){return x.getObjValue()})
+        }
+        ref.display =  function(renderFunction){
+            var footers;
+            var render = function(parent,element){
+                element && parent.removeChild(element);
+                ref.__values.forEach(x=>x.display(renderFunction,x).render(parent))
+                var footerElms = footers && footers.map(function(x){return x.render(parent)});
+                ref.__renders.push({renderFunction,parent,footerElms});
+            }
+            var footer = function(footerRF){
+                footers = footers || []
+                if(footerRF.ruleType == 'list') throw 'footer cannot directly contain a RenderList, it can, however, contain an element with a list in it.'
+                footers.push(footerRF);
+                return{ruleType:'list',footer,render}
+            }
+            return {ruleType:'list',footer,render}
         }
         return ref;
 
@@ -236,25 +241,6 @@
 
         function deleteRF(renderFunction){
             ref.__renders.filter(function(x){x != renderFunction})
-        }
-
-        
-        function bind(renderFunction,uf){
-            var footers;
-            var render = function(parent,element){
-                element && parent.removeChild(element);
-                var functionName = uf && 'ufDisplay' || 'display'
-                ref.__values.forEach(x=>x[functionName](renderFunction,x).render(parent))
-                var footerElms = footers && footers.map(function(x){return x.render(parent)});
-                ref.__renders.push({renderFunction,parent,footerElms});
-            }
-            var footer = function(footerRF){
-                footers = footers || []
-                if(footerRF.ruleType == 'list') throw 'footer cannot directly contain a RenderList, it can, however, contain an element with a list in it.'
-                footers.push(footerRF);
-                return{ruleType:'list',footer,render}
-            }
-            return {ruleType:'list',footer,render}
         }
     }
 
@@ -289,12 +275,19 @@
 
 //autocomplete fix for vscode 26
 //todo make trace work on both front and backend 13
-//todo rename it it "gium" or "vestigium" or "nishaan" or "rastro" or "Spur" or "harch" "kursdom" "layshon"
+//todo rename it it "gium" or "vestigium" or "nishaan" or "rastro" or "Spur" or "harch" "kursdom" "layshon" "sorghum"
 //todo test on IE ughghghg
 //rename render to insertInto
 //html to trace converter
 //addEventListener thing
-//todo remove ufDisplay. its a hack and people should do it themselves. (add it to the widgets)
+//todo remove at and insert at should not be able to go negative
+//todo add deleteAll function to renderList continued...
+//todo add onchange event and on delete event to props and lists,
 //
 //
 //bug "trace(this)" pollutes the global scope
+//bug not all atrRenders are deleted when renderProp is deleted
+
+//widgets:
+//todo add blank html page comp
+//todo add text area binding thing
