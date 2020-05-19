@@ -157,25 +157,20 @@
             }
         }
     }
-    //here333
-    function RenderListItem(value,id,getUtils,onDeleteRF){
-        return RenderListItem.generateFromRenderProp(new RenderProp(value),id,getUtils,onDeleteRF)
-    }
-    RenderListItem.generateFromRenderProp = function (renderProp,id,getUtils,onDeleteRF){
+
+    function makeRenderListItem(renderProp,id,getUtils,onDeleteRF){
+        renderProp instanceof RenderProp || (renderProp = new RenderProp(renderProp))
         renderProp.utils = getUtils(renderProp);
         renderProp.id = id;
         renderProp.onDeleteRF = onDeleteRF;
         return renderProp
-    } 
+    }
 
     window.RenderList = function(values){
         var ref = this;
         var idItr= 0;
         atrFunctions(ref);
-        ref.__values = values.map(function(x){
-            if(x instanceof RenderProp) return RenderListItem.generateFromRenderProp(xidItr++,getUtils,deleteRF)
-            return new RenderListItem(x,idItr++,getUtils,deleteRF)
-        });
+        ref.__values = values.map(function(x){ return makeRenderListItem(x,idItr++,getUtils,deleteRF) });
         ref.__renders = [];
 
         ref.at = function(index){return ref.__values[index];}
@@ -188,7 +183,7 @@
 
         ref.insertAt = function(index,value){
             var currentProp = ref.__values[index];
-            var newProp = new RenderListItem(value,idItr++,getUtils,deleteRF);
+            var newProp = makeRenderListItem(value,idItr++,getUtils,deleteRF);
             if(currentProp){
                 ref.__renders.forEach(x=>{
                     var currentRender = currentProp.__renders.find(r=> r.parent == x.parent)//getRender(currentProp,x.parent);
@@ -291,8 +286,6 @@
 //loose focus update. 5
 //todo make trace work on both front and backend 13
 //todo rename it it "gium" or "vestigium" or "nishaan" or "rastro" or "Spur" or "harch" "kursdom" "layshon"
-//todo getValue for render list
-//todo clean up //here333
 //todo test on IE ughghghg
 //rename render to insertInto
 //html to trace converter
