@@ -24,9 +24,10 @@ function trace(context){
             return {};
             function isContent(param){
                 return allowedTypes.includes(typeof(param)) 
-                || param instanceof renderObject 
                 || Array.isArray(param)
-                || param instanceof Element;
+                || param instanceof Element
+                || (param && param.render)
+                || (param && param.genAtr);
             }
             function isAttributes(param){
                 return !!param;
@@ -56,20 +57,33 @@ function trace(context){
         }
         function createElement(){
             var elem = document.createElement(elemType);
+            var ruleTypesUsed =[];
             params.content != null && params.content != undefined && setContent(elem,params.content);
             params.attributes && setAttributes(elem,params.attributes);
+           
             return elem;
-
+            
             function setContent(element,content){
                 setContentRecursive(content);  
                 function setContentRecursive(cnt){
                     if(Array.isArray(cnt)) return cnt.forEach(setContentRecursive);
+                    checkForError(cnt.ruleType)
                     if(allowedTypes.includes(typeof cnt)) 
                         return (element.innerHTML += cnt);
                     if(content instanceof Element)
                         return element.appendChild(cnt)
+                    cnt.genAtr && 
+                    cnt.genAtr('innerHTML',element);
                     cnt.render && cnt.render(element);
-                    cnt instanceof Element && element.appendChild(cnt);
+                }
+
+                function checkForError(ruleType){
+                    if(ruleTypesUsed[ruleTypesUsed.length-1] == 'list')
+                        throw 'only one list can be used in each element\'s content, and it must be the last item'
+                    if(ruleTypesUsed.length && ruleType == 'atrObj' 
+                    || ruleTypesUsed[ruleTypesUsed.length-1] == 'atrObj')
+                        throw '.atr(...) needs to be the only item in the parent elements content'
+                    ruleTypesUsed.push(ruleType)
                 }
             }
 
@@ -139,15 +153,30 @@ class RenderProp{
         }
 
         ref.atr = function(renderFunction){
-            return new (function(){
-                var atrObj = this;    
-                atrObj.renderFunction =  renderFunction || (function(x){return x});
-                atrObj.genAtr = function(atrName,elem){
-                    var atrRender = ()=>{elem.setAttribute(atrName,atrObj.renderFunction(ref.__value))}
+            renderFunction =  renderFunction || function(x){return x};
+            return {
+                ruleType:'atrObj',
+                genAtr:function(atrName,elem){
+                    function atrRender(){
+                        if(atrName == 'innerHTML') return elem.innerHTML = renderFunction(ref.__value);
+                        elem.setAttribute(atrName,renderFunction(ref.__value))
+                    }
                     ref.__atrRenders.push({atrRender,elem});
                     atrRender();
                 }
-            })()
+            }
+
+
+            // return new (function(){
+            //     var atrObj = this;    
+            //     atrObj.renderFunction =  renderFunction || (function(x){return x});
+            //     atrObj.ruleType = 'atrObj'
+            //     atrObj.genAtr = function(atrName,elem){
+            //         var atrRender = ()=>{elem.setAttribute(atrName,atrObj.renderFunction(ref.__value))}
+            //         ref.__atrRenders.push({atrRender,elem});
+            //         atrRender();
+            //     }
+            // })()
         }
 
         ref.getValue = function(){
@@ -241,7 +270,9 @@ class RenderList{
         ref.display = function(renderFunction){return bind(renderFunction,false)}
         ref.ufDisplay = function(renderFunction){return bind(renderFunction,true)}
         function bind(renderFunction,uf){
-            return {render:function(parent,element){
+            return {
+                ruleType:'list',
+                render:function(parent,element){
                 element && parent.removeChild(element);
                 ref.__renders.push({renderFunction,parent});
                 var functionName = uf && 'ufDisplay' || 'display'
@@ -254,22 +285,11 @@ class RenderList{
 //IT AINT DONE YET
 
 //autocomplete fix for vscode 26
-//todo stop user from using multiple lists per parent 5
 //todo "footer" prop for lists. 5
 //loose focus update. 5
 //todo make trace work on both front and backend 13
 //todo make trace handle onkeypress events. 5
-//todo rename it it "gium" or "vestigium" or "nishaan" or "rastro" or "Spur" or something
-//todo make an atrInnerHtml thing
+//todo rename it it "gium" or "vestigium" or "nishaan" or "rastro" or "Spur" or "harch" "kursdom" "layshon"
+//todo add atr to renderList ...ugh
 
-
-//bug does not look like you can return a x.display() result ???
-
-// function atrInEfficientTest(){
-//     var p = new RenderProp(5);
-//     return p.display(x=>div([
-//         h1({class:x, onclick:x=>p.update(x=>x+1)},'click me'),
-//         fortyK()
-//     ]));
-// }
 

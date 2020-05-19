@@ -1,4 +1,5 @@
 var demos = [
+   // test,
     intro,
     intoContinued,
     bindingDemo,
@@ -144,17 +145,17 @@ function bindingDemo(){
 function intro(){
     trace(this);
     return div([
-        h1({class:'blue-text'},'this a tool i made called trace'),
+        h1({class:'blue-text'},'This a tool I made called trace (name pending)'),
         h3({class:'red-text'},'I can add all kinds of things to this'),
         button({onclick:()=>alert('this works')},'buttons work pretty easily'),
         p('this is what the code looks like'),
         p('div(['),
-        p(`......h1({class:'blue-text'},'this is the stupid thing i made'),`),
+        p(`......h1({class:'blue-text'},'This a tool I made called trace (name pending)'),`),
         p(`......h3({class:'red-text'},'I can add all kinds of things to this'),`),
         p(`......button({onclick:()=>alert('this works')},'buttons work pretty easily'),`),
         p(`......p('this is what the code looks like'),`),
         p('])'),
-        p('I cant get rid of the "..." because spaces get cut off'),
+        p('I can\'t get rid of the "..." because spaces get cut off >:('),
         h2('You can press [Enter] cycle through the demos')
     ])
 }
@@ -162,7 +163,7 @@ function intro(){
 function intoContinued(){
     trace(this);
     return div([
-        h3('to get started you need to add the code <trace(this)> to the top of your function'),
+        h3('To get started you need to add this code --trace(this);-- to the top of your function'),
         br(),
         h3('this adds a whole slue of 3 letter functions to your function without polluting the global scope'),
         h5({class:'blue-text'},'you can also use trace(window), if you don\'t care about the global scope, or you can use --var traceFunctions = trace()-- and use --traceFunctions.div()-- if you want'),
@@ -170,20 +171,21 @@ function intoContinued(){
         h3('now take a look at a simple trace-"element"'),
         h1('div({},[])'),
         h3('it is simply a function that takes 2 parameters. an object, and an array'),
-        h3('the object holds all the attributes for the element ex:{class:"red"}, this will set the class of the element to "red". This also works for "id", "custom-attribute", and even things like "onclick" events, you can simply use --{onclick:function(){alert("hey")}}--'),
+        h3('the object holds all the attributes for the element ex:{class:"red"}, this will set the class of the element to "red". This also works for "id", "custom-attribute" like so: div({class:"red",id:"main-div","custom-attribute":"this is custom"})'),
+        h3('You can even add things like "onclick" events, you can simply use --{onclick:function(){alert("hey")}}--'),
         h3('the second param holds a list of all the other trace-elements. so a div might have 2 h1\'s in it ex: div({},[h1("1"),h1("2")])'),
         h3('the elements in the array are added to the element as children in the order given'),
         br(),
         h3('now lets take a look at the --h1("1")-- trace-element. notice how it didn\'t have 2 params and instead of an array it just has a string?'),
         h3('This is because if an array is not given, instead a string is given (or boolean or number), trace will set the innerHTML to the given value.'),
-        h3('trace will also infer if you are handing it attributes or not. so if you just call div like so: <div([h1("1"),h1("2")])> it will infer that it does not have any attributes and will just set the children'),
+        h3('trace will also infer if you are handing it attributes or not. so if you just call div like so: --div([h1("1"),h1("2")])-- it will infer that it does not have any attributes and will just set the children'),
         h3('this also works for attributes: --div({class:"red"})--, this example has no children but a class of "red"'),
         br(),
         h3('Also trace will iterate through arrays recursively. ex --div([[h1("1"),[h1("2"),h1("3")],h1("4")],[h1("5"),h1("6")]])--. This will show up as a div with "1,2,3,4,5,6" in it'),
         h3('this is done so you can add arrays together easily, just put them both in a parent array. it also stops annoying issues like this --div([arr.map(x=>h1(x))])-- the div is given an array, and inside is the "map" function which returns another array.'),
         h3('if it didn\'t recursively iterate through the arrays you would get an error.'),
         br(),
-        h3('lastly you we need to call the "render" function it takes an element that will be the parent, and it will return the created element ex:'),
+        h3('lastly we need to call the "render" function it takes an element that will be the parent, and it will return the created element ex:'),
         h1('div([h1("this is a trace app")]).render(document.getElementById("some-id"))'),
         h3('this will actually attach the element to the page. it will insert a div with and h1 into the element with "some-id"'),
         h3('it does this by creating an element, then recursively calling each trace-element\'s render function, passing its element in as the parameter. This will recursively append each element to the one above it'),
@@ -247,4 +249,10 @@ function fortyK(){
         a.push(b)
     }
     return div(a.map(x=>div({class:'column'},x.map(y=>div({class:'point'})))))
+}
+
+function test(){
+    var rl = new RenderList([1,2,3,4])
+    var rp = new RenderProp('red');
+    return h1({class:rp.atr()},[[],rp.atr()])
 }
