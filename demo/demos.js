@@ -1,5 +1,5 @@
 var demos = [
-    test,
+    listDemo,
     intro,
     intoContinued,
     bindingDemo,
@@ -7,7 +7,7 @@ var demos = [
     makeBigEfficientGraph,
     atrInEfficientTest,
     atrEfficientTest,
-    listDemo,
+    
 ]
 
 function app(root){

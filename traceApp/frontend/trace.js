@@ -1,112 +1,112 @@
-function trace(context){
-    context = context || {};
-    var allowedTypes = "string,number,boolean".split(','); 
+(function(){
+    "use strict"
+    window.trace = function(context){
+        context = context || {};
+        var allowedTypes = "string,number,boolean".split(','); 
 
-    "a,abbr,acronym,address,applet,area,article,aside,audio,b,base,basefont,bb,bdo,big,blockquote,body,br,button,canvas,caption,center,cite,code,col,colgroup,command,datagrid,datalist,dd,del,details,dfn,dialog,dir,div,dl,dt,em,embed,eventsource,fieldset,figcaption,figure,font,footer,form,frame,frameset,h1,h2,h3,h4,h5,h6,head,header,hgroup,hr,html,i,iframe,img,input,ins,isindex,kbd,keygen,label,legend,li,link,map,mark,menu,meta,meter,nav,noframes,noscript,object,ol,optgroup,option,output,p,param,pre,progress,q,rp,rt,ruby,s,samp,script,section,select,small,source,span,strike,strong,style,sub,sup,table,tbody,td,textarea,tfoot,th,thead,time,title,tr,track,tt,u,ul,var,video,wbr"
-    .split(',').forEach(function(elemName){
-        context[elemName] = function(param1,param2,extra){
-            if(extra) throw elemName+"() cannot have more than 2 parameters"
-            return generateElement(elemName,param1,param2)}
-    })
-    return context
+        "a,abbr,acronym,address,applet,area,article,aside,audio,b,base,basefont,bb,bdo,big,blockquote,body,br,button,canvas,caption,center,cite,code,col,colgroup,command,datagrid,datalist,dd,del,details,dfn,dialog,dir,div,dl,dt,em,embed,eventsource,fieldset,figcaption,figure,font,footer,form,frame,frameset,h1,h2,h3,h4,h5,h6,head,header,hgroup,hr,html,i,iframe,img,input,ins,isindex,kbd,keygen,label,legend,li,link,map,mark,menu,meta,meter,nav,noframes,noscript,object,ol,optgroup,option,output,p,param,pre,progress,q,rp,rt,ruby,s,samp,script,section,select,small,source,span,strike,strong,style,sub,sup,table,tbody,td,textarea,tfoot,th,thead,time,title,tr,track,tt,u,ul,var,video,wbr"
+        .split(',').forEach(function(elemName){
+            context[elemName] = function(param1,param2,extra){
+                if(extra) throw elemName+"() cannot have more than 2 parameters"
+                return generateElement(elemName,param1,param2)}
+        })
+        return context
 
-    function generateElement(elemType,param1,param2){
-        var params = processParams(param1,param2)
-        return new renderObject(params,elemType)
+        function generateElement(elemType,param1,param2){
+            var params = processParams(param1,param2)
+            return new renderObject(params,elemType)
 
-        function processParams(param1,param2){
-            if(isContent(param1)){
-                if(!param2) return {content:param1}
-                else throw "cannot have another parameter after content"
-            } 
-            if(isContent(param2) && isAttributes(param1)) return {attributes:param1,content:param2}
-            if(isAttributes(param1)) return {attributes:param1}
-            return {};
-            function isContent(param){
-                return allowedTypes.includes(typeof(param)) 
-                || Array.isArray(param)
-                || param instanceof Element
-                || (param && param.render)
-                || (param && param.genAtr);
+            function processParams(param1,param2){
+                if(isContent(param1)){
+                    if(!param2) return {content:param1}
+                    else throw "cannot have another parameter after content"
+                } 
+                if(isContent(param2) && isAttributes(param1)) return {attributes:param1,content:param2}
+                if(isAttributes(param1)) return {attributes:param1}
+                return {};
+                function isContent(param){
+                    return allowedTypes.includes(typeof(param)) 
+                    || Array.isArray(param)
+                    || param instanceof Element
+                    || (param && param.render)
+                    || (param && param.genAtr);
+                }
+                function isAttributes(param){
+                    return !!param;
+                }
             }
-            function isAttributes(param){
-                return !!param;
-            }
         }
-    }
 
-    function renderObject(params,elemType){
-        var ref = this;
-        ref.parameters = params,
-        ref.elementType = elemType
-        ref.render = function(parent,oldElem){
-            ref.element = createElement();
-            oldElem && parent.insertBefore(ref.element,oldElem);
-            oldElem && parent.removeChild(oldElem);
-            !oldElem && parent.appendChild(ref.element);
-            return ref.element;
-        }
-        ref.delete = function(){
-            ref.element.parentNode.removeChild(ref.element)
-        }
-        ref.onRender = function(callback){
-            return{render:function(parent,elem){
-                var elem = ref.render(parent,elem);
-                callback(elem,ref);
-            }}
-        }
-        function createElement(){
-            var elem = document.createElement(elemType);
-            var ruleTypesUsed =[];
-            params.content != null && params.content != undefined && setContent(elem,params.content);
-            params.attributes && setAttributes(elem,params.attributes);
-           
-            return elem;
+        function renderObject(params,elemType){
+            var ref = this;
+            ref.parameters = params,
+            ref.elementType = elemType
+            ref.render = function(parent,oldElem){
+                ref.element = createElement();
+                oldElem && parent.insertBefore(ref.element,oldElem);
+                oldElem && parent.removeChild(oldElem);
+                !oldElem && parent.appendChild(ref.element);
+                return ref.element;
+            }
+            ref.delete = function(){
+                ref.element.parentNode.removeChild(ref.element)
+            }
+            ref.onRender = function(callback){
+                return{render:function(parent,elem){
+                    var elem = ref.render(parent,elem);
+                    callback(elem,ref);
+                }}
+            }
+            function createElement(){
+                var elem = document.createElement(elemType);
+                var ruleTypesUsed =[];
+                params.content != null && params.content != undefined && setContent(elem,params.content);
+                params.attributes && setAttributes(elem,params.attributes);
             
-            function setContent(element,content){
-                setContentRecursive(content);  
-                function setContentRecursive(cnt){
-                    if(Array.isArray(cnt)) return cnt.forEach(setContentRecursive);
-                    checkForError(cnt.ruleType)
-                    if(allowedTypes.includes(typeof cnt)) 
-                        return (element.innerHTML += cnt);
-                    if(content instanceof Element)
-                        return element.appendChild(cnt)
-                    cnt.genAtr && 
-                    cnt.genAtr('innerHTML',element);
-                    cnt.render && cnt.render(element);
+                return elem;
+                
+                function setContent(element,content){
+                    setContentRecursive(content);  
+                    function setContentRecursive(cnt){
+                        if(Array.isArray(cnt)) return cnt.forEach(setContentRecursive);
+                        checkForError(cnt.ruleType)
+                        if(allowedTypes.includes(typeof cnt)) 
+                            return (element.innerHTML += cnt);
+                        if(content instanceof Element)
+                            return element.appendChild(cnt)
+                        cnt.genAtr && 
+                        cnt.genAtr('innerHTML',element);
+                        cnt.render && cnt.render(element);
+                    }
+
+                    function checkForError(ruleType){
+                        if(ruleTypesUsed[ruleTypesUsed.length-1] == 'list')
+                            throw 'only one list can be used in each element\'s content, and it must be the last item'
+                        if(ruleTypesUsed.length && ruleType == 'atrObj' 
+                        || ruleTypesUsed[ruleTypesUsed.length-1] == 'atrObj')
+                            throw '.atr(...) needs to be the only item in the parent elements content'
+                        ruleTypesUsed.push(ruleType)
+                    }
                 }
 
-                function checkForError(ruleType){
-                    if(ruleTypesUsed[ruleTypesUsed.length-1] == 'list')
-                        throw 'only one list can be used in each element\'s content, and it must be the last item'
-                    if(ruleTypesUsed.length && ruleType == 'atrObj' 
-                    || ruleTypesUsed[ruleTypesUsed.length-1] == 'atrObj')
-                        throw '.atr(...) needs to be the only item in the parent elements content'
-                    ruleTypesUsed.push(ruleType)
+                function setAttributes(element,attributes){
+                    Object.keys(attributes).forEach(function(key){
+                        if(attributes[key].genAtr) return attributes[key].genAtr(key,element);
+                        (typeof attributes[key] == "function") && 
+                        (element[key] = attributes[key]) || 
+                        element.setAttribute(key,attributes[key])
+                    });
                 }
-            }
-
-            function setAttributes(element,attributes){
-                Object.keys(attributes).forEach(function(key){
-                    if(attributes[key].genAtr) return attributes[key].genAtr(key,element);
-                    (typeof attributes[key] == "function") && 
-                    (element[key] = attributes[key]) || 
-                    element.setAttribute(key,attributes[key])
-                });
             }
         }
     }
-}
-
-class RenderProp{
-    constructor(value){
+    window.RenderProp = function(value){
         var ref = this;
         if(value instanceof RenderProp) ref.value = value.get();
         ref.__renders = [];
         atrFunction(ref);
         ref.__value = value;
-  
+
         ref.update = function(updateFunction){
             updateFunction = updateFunction || function(x){return x}
             ref.set(updateFunction(ref.get()))
@@ -132,9 +132,18 @@ class RenderProp{
                 x.parent.removeChild(x.elem);
             })
         }
-
         ref.ufDisplay = function(renderFunction){return bind(renderFunction,true)}
         ref.display = function(renderFunction){return bind(renderFunction,false)}
+        ref.getValue = function(){
+            var output = {};
+            Object.keys(ref.__value).forEach(key=>{
+                var val = ref.__value[key];
+                val = val.getValue && val.getValue() || val;
+                output[key] = val;
+            })
+            return output;
+        }
+        return ref;
         function bind(renderFunction,unFoc){
             return {
                 render:function(parent){
@@ -147,33 +156,19 @@ class RenderProp{
                 }
             }
         }
-
-        ref.getValue = function(){
-            var output = {};
-            Object.keys(ref.__value).forEach(key=>{
-                var val = ref.__value[key];
-                val = val.getValue && val.getValue() || val;
-                output[key] = val;
-            })
-            return output;
-        }
     }
-}
 
-class RenderListItem extends RenderProp{
-    constructor(value,id,getUtils,onDeleteRF){
+    function RenderListItem(value,id,getUtils,onDeleteRF){
         return RenderListItem.generateFromRenderProp(new RenderProp(value),id,getUtils,onDeleteRF)
     }
-    static generateFromRenderProp(renderProp,id,getUtils,onDeleteRF){
+    RenderListItem.generateFromRenderProp = function (renderProp,id,getUtils,onDeleteRF){
         renderProp.utils = getUtils(renderProp);
         renderProp.id = id;
         renderProp.onDeleteRF = onDeleteRF;
         return renderProp
     } 
-}
 
-class RenderList{
-    constructor(values){
+     window.RenderList = function(values){
         var ref = this;
         var idItr= 0;
         atrFunction(ref);
@@ -191,28 +186,12 @@ class RenderList{
         ref.prepend = function(value){ref.insertAt(0,value)};
         ref.append = function(value){ref.insertAt(ref.__values.length,value)}
 
-        function getIndexFromId(id){
-            var index;
-            ref.__values.find((x,i)=>x.id == id && (index =i))
-            return index;
-        }
-
-        function getUtils(rProp){
-            rProp.delete = function(){return ref.removeAt(getIndexFromId(rProp.id))}
-            rProp.getIndex = function(){return getIndexFromId(rProp.id)}
-            rProp.insertAt = function(index,value){return ref.insertAt(index,value)}
-        }
-
-        function deleteRF(renderFunction){
-            ref.__renders.filter(function(x){x != renderFunction})
-        }
-
         ref.insertAt = function(index,value){
             var currentProp = ref.__values[index];
             var newProp = new RenderListItem(value,idItr++,getUtils,deleteRF);
             if(currentProp){
                 ref.__renders.forEach(x=>{
-                    var currentRender = currentProp.__renders.find(x=> x.parent == parent)//getRender(currentProp,x.parent);
+                    var currentRender = currentProp.__renders.find(r=> r.parent == x.parent)//getRender(currentProp,x.parent);
                     var newElem = newProp.display(x.renderFunction,getUtils(newProp)).render(x.parent)
                     x.parent.insertBefore(newElem,currentRender.elem)
                 })
@@ -240,6 +219,25 @@ class RenderList{
 
         ref.display = function(renderFunction){return bind(renderFunction,false)}
         ref.ufDisplay = function(renderFunction){return bind(renderFunction,true)}
+        return ref;
+
+        function getIndexFromId(id){
+            var index;
+            ref.__values.find((x,i)=>x.id == id && (index =i))
+            return index;
+        }
+
+        function getUtils(rProp){
+            rProp.delete = function(){return ref.removeAt(getIndexFromId(rProp.id))}
+            rProp.getIndex = function(){return getIndexFromId(rProp.id)}
+            rProp.insertAt = function(index,value){return ref.insertAt(index,value)}
+        }
+
+        function deleteRF(renderFunction){
+            ref.__renders.filter(function(x){x != renderFunction})
+        }
+
+        
         function bind(renderFunction,uf){
             return {
                 ruleType:'list',
@@ -251,32 +249,33 @@ class RenderList{
             }}
         }
     }
-}
 
-function atrFunction(ref){
-    ref.__atrRenders = [];
-    ref.atr = function(renderFunction){
-        renderFunction =  renderFunction || function(x){return x};
-        return {
-            ruleType:'atrObj',
-            genAtr:function(atrName,elem){
-                function atrRender(){
-                    if(atrName == 'innerHTML') return elem.innerHTML = renderFunction(ref.__value || ref.__values,ref);
-                    elem.setAttribute(atrName,renderFunction(ref.__value || ref.__values,ref))
+    function atrFunction(ref){
+        ref.__atrRenders = [];
+        ref.atr = function(renderFunction){
+            renderFunction =  renderFunction || function(x){return x};
+            return {
+                ruleType:'atrObj',
+                genAtr:function(atrName,elem){
+                    function atrRender(){
+                        if(atrName == 'innerHTML') return elem.innerHTML =
+                            renderFunction(ref.__value || ref.__values,ref);
+                        elem.setAttribute(atrName,renderFunction(ref.__value || ref.__values,ref))
+                    }
+                    ref.__atrRenders.push({atrRender,elem});
+                    atrRender();
                 }
-                ref.__atrRenders.push({atrRender,elem});
-                atrRender();
             }
         }
+        ref.__runAllAtrs = function(){
+            ref.__atrRenders = ref.__atrRenders.filter(function(x){
+                if(!document.body.contains(x.elem)) return false;
+                x.atrRender();
+                return true
+            })
+        }
     }
-    ref.__runAllAtrs = function(){
-        ref.__atrRenders = ref.__atrRenders.filter(function(x){
-            if(!document.body.contains(x.elem)) return false;
-            x.atrRender();
-            return true
-        })
-    }
-}
+})()
 
 //IT AINT DONE YET
 
@@ -285,5 +284,4 @@ function atrFunction(ref){
 //loose focus update. 5
 //todo make trace work on both front and backend 13
 //todo rename it it "gium" or "vestigium" or "nishaan" or "rastro" or "Spur" or "harch" "kursdom" "layshon"
-//todo wrap code so it its inaccessible
-
+//todo getValue for render list
