@@ -10,6 +10,19 @@ var demos = [
     
 ]
 
+function test(){
+    var rl = new RenderList([1,'hahah',3,'red'])
+    var rp = new RenderProp('red');
+    setTimeout(()=>{
+        rl.insertAt(3,'blue')
+        rp.set('blue')
+    }
+    ,1500)
+    //return h1({class:rp.atr((x,y)=>y.__value)},rp.atr())
+    return h1({class:rl.atr((x,y)=> y.__values[3].get())}
+    ,rl.atr(x=>x[3].get()))
+}
+
 function app(root){
     var state = new RenderProp(0);
     trace(this);
@@ -44,13 +57,15 @@ function listDemo(){
         h3('Here is a RenderList, it is "displayed" 3 times in 3 different ways'),
         h5('This one displays each number in a different color depending on its remainder when dived by 3 (just so you can see class updates)'),
         div([
-            list.display((x,li)=>h1({class:li.atr(x=>['red-text','green-text','blue-text'][x%3])},x)),
+            list.display((x,li)=>h1({class:li.atr(x=>['red-text','green-text','blue-text'][x%3])},x))
+            .footer(h1('test')),
         ]),
 
         div([
             h5('something to mention about lists is they do not replace or remove elements before them. this is so table headers are not affected'),
             h5('so it may cause confusion, lists are tricky. best to wrap them in a div if you don\'t want trouble (room for improvement!)'),
-            list.display(x=>h5(x)),
+            list.display(x=>h5(x)).
+            footer(h1(list.atr(x=>x.length))),
         ]),
 
         h5('Here you can see that every list item is given "utilities", these include delete, insert-before, insert-after, get-current-index, and edit. the edit just increments the number'),
@@ -82,8 +97,8 @@ function makeBigInEfficientGraph(){
     trace(this);
 
     var gr = new RenderProp(graph)
-    return div({class:'blue'},[
-        h5('here I made my tool make 10k elements. if you click one it will increment the number (you may notice a problem)'),
+    return div({class:'green'},[
+        h5('here I had my tool make 10k elements. if you click one it will increment the number (you may notice a problem)'),
         gr.display(
             g=>table([
                 g.map((x,i)=>tr(
@@ -146,7 +161,7 @@ function intro(){
     trace(this);
     return div([
         h1({class:'blue-text'},'This a tool I made called trace (name pending)'),
-        h3({class:'red-text'},'I can add all kinds of things to this'),
+        h3({class:'red-text'},'It is a way to generate dom elements on the client side without a huge framework'),
         button({onclick:()=>alert('this works')},'buttons work pretty easily'),
         p('this is what the code looks like'),
         p('div(['),
@@ -192,26 +207,6 @@ function intoContinued(){
     ])
 }
 
-// function test(){
-//     var p = new RenderProp({})
-//     var s = new RenderList([1,2,3,4]);
-//     setTimeout(()=>{
-//         p.set({data:s});
-//         console.log(p)
-//     },1000);
-//     return div([
-//         p.display(x=>{
-//             if(!x.data) return h1('loading');
-//             return x.data.display(x=>h1(x))
-//         })
-//     ])
-    
-// }
-
-// function testComp(word){
-//     return h1(word)
-// }
-
 //this should run through every type trace can handle eventually.
 function atrEfficientTest(){
     var p = new RenderProp(5);
@@ -251,15 +246,3 @@ function fortyK(){
     return div(a.map(x=>div({class:'column'},x.map(y=>div({class:'point'})))))
 }
 
-function test(){
-    var rl = new RenderList([1,'hahah',3,'red'])
-    var rp = new RenderProp('red');
-    setTimeout(()=>{
-        rl.insertAt(3,'blue')
-        rp.set('blue')
-    }
-    ,1500)
-    //return h1({class:rp.atr((x,y)=>y.__value)},rp.atr())
-    return h1({class:rl.atr((x,y)=> y.__values[3].get())}
-    ,rl.atr(x=>x[3].get()))
-}

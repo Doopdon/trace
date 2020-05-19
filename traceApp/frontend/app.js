@@ -2,7 +2,7 @@ var state = new RenderProp({data:null})//this is the global state. it has a "sta
 
 function app(root){
     trace(this);//this attaches all the div/h1/table methods to this function (I do this to avoid polluting the global scope) with 800 3 letter functions
-    div([//the div function returns a "renderObject" //TODO capitalize that
+    div([//the div function returns a "RenderObject" 
         h1('here is a crud..y app'),
         h5('lol'),
         state.display(x=>{//the state has a display function. display takes a function. it adds it to a list, it calls all those functions when its value is "set"

@@ -10,7 +10,7 @@
                 if(extra) throw elemName+"() cannot have more than 2 parameters"
                 return generateElement(elemName,param1,param2)}
         })
-        return context
+        return context;
 
         function generateElement(elemType,param1,param2){
             var params = processParams(param1,param2)
@@ -104,7 +104,7 @@
         var ref = this;
         if(value instanceof RenderProp) ref.value = value.get();
         ref.__renders = [];
-        atrFunction(ref);
+        atrFunctions(ref);
         ref.__value = value;
 
         ref.update = function(updateFunction){
@@ -134,11 +134,11 @@
         }
         ref.ufDisplay = function(renderFunction){return bind(renderFunction,true)}
         ref.display = function(renderFunction){return bind(renderFunction,false)}
-        ref.getValue = function(){
+        ref.getObjValue = function(){
             var output = {};
             Object.keys(ref.__value).forEach(key=>{
                 var val = ref.__value[key];
-                val = val.getValue && val.getValue() || val;
+                val = val.getObjValue && val.getObjValue() || val;
                 output[key] = val;
             })
             return output;
@@ -157,7 +157,7 @@
             }
         }
     }
-
+    //here333
     function RenderListItem(value,id,getUtils,onDeleteRF){
         return RenderListItem.generateFromRenderProp(new RenderProp(value),id,getUtils,onDeleteRF)
     }
@@ -168,10 +168,10 @@
         return renderProp
     } 
 
-     window.RenderList = function(values){
+    window.RenderList = function(values){
         var ref = this;
         var idItr= 0;
-        atrFunction(ref);
+        atrFunctions(ref);
         ref.__values = values.map(function(x){
             if(x instanceof RenderProp) return RenderListItem.generateFromRenderProp(xidItr++,getUtils,deleteRF)
             return new RenderListItem(x,idItr++,getUtils,deleteRF)
@@ -199,14 +199,12 @@
             }
             else{
                 ref.__renders.forEach(x=>{
-                    newProp.display(x.renderFunction,getUtils(newProp)).render(x.parent)
+                    var elem = newProp.display(x.renderFunction,getUtils(newProp)).render(x.parent)
+                    x.footerElem && x.parent.insertBefore(elem,x.footerElem);
                 })
                 ref.__values.splice(index,0,newProp);
             }
             ref.__runAllAtrs()
-            function getRender(rProp,parent){
-                return rProp.__renders.find(x=> x.parent == parent)
-            }
         }
         ref.removeAt = function(index){
             var rProp = ref.__values[index];
@@ -219,6 +217,9 @@
 
         ref.display = function(renderFunction){return bind(renderFunction,false)}
         ref.ufDisplay = function(renderFunction){return bind(renderFunction,true)}
+        ref.getObjValue = function(){
+            return ref.__values.map(function(x){return x.getObjValue()})
+        }
         return ref;
 
         function getIndexFromId(id){
@@ -239,18 +240,29 @@
 
         
         function bind(renderFunction,uf){
-            return {
-                ruleType:'list',
-                render:function(parent,element){
+            var footer;
+            var r = function(parent,element){
                 element && parent.removeChild(element);
-                ref.__renders.push({renderFunction,parent});
                 var functionName = uf && 'ufDisplay' || 'display'
                 ref.__values.forEach(x=>x[functionName](renderFunction,x).render(parent))
-            }}
+                var footerElem = footer && footer.render(parent);
+                ref.__renders.push({renderFunction,parent,footerElem});
+            }
+                
+            return {
+                ruleType:'list',
+                footer:function(footerRF){
+                    footer=footerRF;
+                    return{
+                    ruleType:'list',
+                    render:r}
+                },
+                render:r
+            }
         }
     }
 
-    function atrFunction(ref){
+    function atrFunctions(ref){
         ref.__atrRenders = [];
         ref.atr = function(renderFunction){
             renderFunction =  renderFunction || function(x){return x};
@@ -280,8 +292,11 @@
 //IT AINT DONE YET
 
 //autocomplete fix for vscode 26
-//todo "footer" prop for lists. 5
 //loose focus update. 5
 //todo make trace work on both front and backend 13
 //todo rename it it "gium" or "vestigium" or "nishaan" or "rastro" or "Spur" or "harch" "kursdom" "layshon"
 //todo getValue for render list
+//todo clean up //here333
+//todo test on IE ughghghg
+//rename render to insertInto
+//html to trace converter
