@@ -58,7 +58,9 @@ function listDemo(){
         h5('This one displays each number in a different color depending on its remainder when dived by 3 (just so you can see class updates)'),
         div([
             list.display((x,li)=>h1({class:li.atr(x=>['red-text','green-text','blue-text'][x%3])},x))
-            .footer(h1('test')),
+            .footer(h1('one footer'))
+            .footer(h3('another')),
+
         ]),
 
         div([

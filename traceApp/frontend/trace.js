@@ -114,7 +114,7 @@
         ref.get = function(){return ref.__value};
         ref.set = function(newValue){
             ref.__value =  newValue;
-            ref.__runAllAtrs();
+            ref.__runAllAtrFunctions();
             ref.__renders = ref.__renders.filter(function(x){
                 if(!document.body.contains(x.elem)) {
                     ref.onDeleteRF && ref.onDeleteRF(x.renderFunction)
@@ -200,18 +200,18 @@
             else{
                 ref.__renders.forEach(x=>{
                     var elem = newProp.display(x.renderFunction,getUtils(newProp)).render(x.parent)
-                    x.footerElem && x.parent.insertBefore(elem,x.footerElem);
+                    x.footerElms && x.parent.insertBefore(elem,x.footerElms[0]);
                 })
                 ref.__values.splice(index,0,newProp);
             }
-            ref.__runAllAtrs()
+            ref.__runAllAtrFunctions()
         }
         ref.removeAt = function(index){
             var rProp = ref.__values[index];
             if(!rProp) return null;
             rProp.deleteAll();
             ref.__values.splice(index,1);
-            ref.__runAllAtrs()
+            ref.__runAllAtrFunctions()
             return rProp.get();
         }
 
@@ -240,25 +240,21 @@
 
         
         function bind(renderFunction,uf){
-            var footer;
-            var r = function(parent,element){
+            var footers;
+            var render = function(parent,element){
                 element && parent.removeChild(element);
                 var functionName = uf && 'ufDisplay' || 'display'
                 ref.__values.forEach(x=>x[functionName](renderFunction,x).render(parent))
-                var footerElem = footer && footer.render(parent);
-                ref.__renders.push({renderFunction,parent,footerElem});
+                var footerElms = footers && footers.map(function(x){return x.render(parent)});
+                ref.__renders.push({renderFunction,parent,footerElms});
             }
-                
-            return {
-                ruleType:'list',
-                footer:function(footerRF){
-                    footer=footerRF;
-                    return{
-                    ruleType:'list',
-                    render:r}
-                },
-                render:r
+            var footer = function(footerRF){
+                footers = footers || []
+                if(footerRF.ruleType == 'list') throw 'footer cannot directly contain a RenderList, it can, however, contain an element with a list in it.'
+                footers.push(footerRF);
+                return{ruleType:'list',footer,render}
             }
+            return {ruleType:'list',footer,render}
         }
     }
 
@@ -279,7 +275,7 @@
                 }
             }
         }
-        ref.__runAllAtrs = function(){
+        ref.__runAllAtrFunctions = function(){
             ref.__atrRenders = ref.__atrRenders.filter(function(x){
                 if(!document.body.contains(x.elem)) return false;
                 x.atrRender();
@@ -300,3 +296,4 @@
 //todo test on IE ughghghg
 //rename render to insertInto
 //html to trace converter
+//
