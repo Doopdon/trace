@@ -249,7 +249,7 @@
             var dest = ref.__values[destIndex+shifter]; 
             source.__renders.forEach(function(sr,i){
                 if(dest) sr.parent.insertBefore(sr.elem,dest.__renders[i].elem)
-                else if(ref.__renders[sourceIndex].footerElms)
+                else if(ref.__renders[i].footerElms)
                      sr.parent.insertBefore(sr.elem,ref.__renders[i].footerElms[0])
                 else sr.parent.appendChild(sr.elem);
             })
@@ -261,35 +261,9 @@
         }
 
         ref.sort = function(sortFunction){
-           ref.__values.sort((x,y)=>sortFunction(x.get(),y.get(),x,y))
+           if(sortFunction) ref.__values.sort((x,y)=>sortFunction(x.get(),y.get(),x,y))
+           else ref.__values.sort();
            ref.__values.forEach(function(){ref.move(0,ref.getLength())})
-        //    ref.values.moveTo
-
-
-        //    var currentProp = ref.__values[index];
-        //    var newProp = makeRenderListItem(value,idItr++,getUtils,deleteRF);
-        //    if(currentProp){
-        //        ref.__renders.forEach(x=>{
-        //            var currentRender = currentProp.__renders.find(r=> r.parent == x.parent);
-        //            var newElem = newProp.display(x.renderFunction,getUtils(newProp)).render(x.parent);
-        //            x.parent.insertBefore(newElem,currentRender.elem);
-        //        })
-        //        ref.__values.splice(index,0,newProp);
-        //    }
-        //    else{
-        //        ref.__renders.forEach(x=>{
-        //            x.footerElms && x.parent.insertBefore(x.elem,x.footerElms[0]);
-        //        })
-        //        ref.__values.splice(index,0,newProp);
-        //    }
-        //    ref.__runAllAtrFunctions();
-        //    ref.__onChangeEvent();
-       
-
-
-
-
-
         }
         return ref;
 
@@ -341,7 +315,7 @@
 
     function setupOnChangeEvents(ref){
         ref.__onDeleteFunctions = []
-        ref.onDelete = ref.__onDeleteFunctions.push
+        ref.onDelete = function(x){ref.__onDeleteFunctions.push(x)}
         ref.__deleteEvent = function(){
             ref.__onDeleteFunctions.forEach(function(x){x()})
             ref.__onDeleteFunctions = [];
@@ -351,23 +325,12 @@
             ref.__onDeleteFunctions = ref.__onDeleteFunctions.map(x=>x!=fn)}
 
         ref.__onChangeFunctions = [];
-        ref.onChange =ref.__onChangeFunctions.push
+        ref.onChange = function(x){ref.__onChangeFunctions.push(x)}
         ref.__onChangeEvent = function(){
             ref.__onChangeFunctions.forEach(function(x){x(ref.__value || ref.__values)})
         }
         ref.removeOnChangeFunction = function(fn){
             ref.__onChangeFunctions = ref.__onChangeFunctions.map(x=>x!=fn)}
-    }
-
-    function joinOn(array1,array2,prop){
-        var joinList = {};
-        var t;
-        array1.forEach(function(x){joinList[x[prop]] = [x]});
-        array2.forEach(function(x){joinList[x[prop]] ?
-          joinList[x[prop]].push(x) :
-          (joinList[x[prop]] =[undefined,x])
-        });
-        return joinList;
     }
 })()
 
@@ -375,7 +338,7 @@
 
 //autocomplete fix for vscode 26
 //todo make trace work on both front and backend 13
-//todo rename it "gium" "vestigium" "nishaan" "rastro" "Spur" "harch" "kursdom" "layshon" "sorghum"
+//todo rename it "gium" "vestigium" "nishaan" "rastro" "Spur" "harch" "kursdom" "layshon" "sorghum" ???doopdon???
 //todo test on IE ughghghg
 //rename render to insertInto
 //addEventListener thing
@@ -389,11 +352,14 @@
 //todo add warning or something 444
 //todo add moveto function to utilities
 //todo add footer error message if you hand in a function
+
 //
 //
+//todo test ondelete/change events FAIL
 //bug "trace(this)" pollutes the global scope
 //expected bug not all atrRenders are deleted when renderProp is deleted
 //expected bug footers will not delete with rest of the list
+//bug  r.display(x=>h1({onclick:r.update(x=>x+1)})),  got weird error about genAtr
 
 //widgets:
 //todo add blank html page comp

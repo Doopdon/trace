@@ -12,16 +12,13 @@ var demos = [
 ]
 
 function test(){
-    
-    var l = new RenderList([1,2,3,4,5,6])
-    var move = {a:0,b:1}
+    var r = new RenderProp(1)
+    var rr = new RenderProp('')
+    r.onChange(x=>rr.update(x=>x+'asdf'))
     return div([
-        textarea({onkeyup:e=>move.a = e.target.value},0),
-        textarea({onkeyup:e=>move.b = e.target.value},1),
-        button({onclick:x=>l.move(move.a,move.b)},'move'),
-        button({onclick:x=>l.sort((a,b)=>b-a)},'sort'),
-        l.display((x,y)=>h1({onclick:x=>alert(y.getIndex())},x)).footer(h1('ahh')).footer(h1('ahhh2'))
-    ]);
+        r.display(x=>h1({onclick:x=>r.update(x=>x+1)},x)),
+        rr.display(x=>h1(x))
+    ])
 }
 
 function app(root){
@@ -51,15 +48,18 @@ function listDemo(){
         h5('Lists need to add, delete and update items without re-rendering. this was hard to do. But the code is simple (I think)'),
         h5('Here are some buttons to changes the list. new items will just be 1+ the last highest number'),
 
+        label('move item at index:'),
         textarea({onkeyup:e=>move.a = e.target.value},0),
+        label('to index:'),
         textarea({onkeyup:e=>move.b = e.target.value},1),
         button({onclick:x=>list.move(move.a,move.b)},'move'),
+        button({onclick:x=>list.sort((x,y)=>x-y)},'sort'),
 
-
-        // button({onclick:()=>list.append(index++)},'append'),
-        // button({onclick:()=>list.prepend(index++)},'prepend'),
-        // button({onclick:()=>list.pop()},'pop'),
-        // button({onclick:()=>list.shift()},'shift'),
+        br(),
+        button({onclick:()=>list.append(index++)},'append'),
+        button({onclick:()=>list.prepend(index++)},'prepend'),
+        button({onclick:()=>list.pop()},'pop'),
+        button({onclick:()=>list.shift()},'shift'),
 
         h3('Here is a RenderList, it is "displayed" 3 times in 3 different ways'),
         h5('This one displays each number in a different color depending on its remainder when dived by 3 (just so you can see class updates)'),
@@ -255,3 +255,13 @@ function fortyK(){
     return div(a.map(x=>div({class:'column'},x.map(y=>div({class:'point'})))))
 }
 
+function joinOn(array1,array2,prop){
+    var joinList = {};
+    var t;
+    array1.forEach(function(x){joinList[x[prop]] = [x]});
+    array2.forEach(function(x){joinList[x[prop]] ?
+      joinList[x[prop]].push(x) :
+      (joinList[x[prop]] =[undefined,x])
+    });
+    return joinList;
+}
