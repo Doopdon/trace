@@ -1,12 +1,6 @@
-function t(){
-    
-     
-}
-t();
-
 
 var demos = [
-    //test,
+    test,
     listDemo,
     intro,
     intoContinued,
@@ -18,15 +12,16 @@ var demos = [
 ]
 
 function test(){
-    var {div,textarea,h1} = trace();
-    var a = RenderProp('asdf')
+    
+    var l = new RenderList([1,2,3,4,5,6])
+    var move = {a:0,b:1}
     return div([
-        a.display(x=>div([
-            textarea({onkeyup:e=>a.set(e.target.value)},x),
-            h1(x),
-        ])),
-        textarea('click here')
-    ])
+        textarea({onkeyup:e=>move.a = e.target.value},0),
+        textarea({onkeyup:e=>move.b = e.target.value},1),
+        button({onclick:x=>l.move(move.a,move.b)},'move'),
+        button({onclick:x=>l.sort((a,b)=>b-a)},'sort'),
+        l.display((x,y)=>h1({onclick:x=>alert(y.getIndex())},x)).footer(h1('ahh')).footer(h1('ahhh2'))
+    ]);
 }
 
 function app(root){
@@ -49,16 +44,22 @@ app(_root)
 function listDemo(){
     var index = 4;
     var list = new RenderList([1,2,3])
+    var move = {a:0,b:1}
     trace(this);
     return div([
         h3('Here is the most complicated part... lists'),
         h5('Lists need to add, delete and update items without re-rendering. this was hard to do. But the code is simple (I think)'),
         h5('Here are some buttons to changes the list. new items will just be 1+ the last highest number'),
 
-        button({onclick:()=>list.append(index++)},'append'),
-        button({onclick:()=>list.prepend(index++)},'prepend'),
-        button({onclick:()=>list.pop()},'pop'),
-        button({onclick:()=>list.shift()},'shift'),
+        textarea({onkeyup:e=>move.a = e.target.value},0),
+        textarea({onkeyup:e=>move.b = e.target.value},1),
+        button({onclick:x=>list.move(move.a,move.b)},'move'),
+
+
+        // button({onclick:()=>list.append(index++)},'append'),
+        // button({onclick:()=>list.prepend(index++)},'prepend'),
+        // button({onclick:()=>list.pop()},'pop'),
+        // button({onclick:()=>list.shift()},'shift'),
 
         h3('Here is a RenderList, it is "displayed" 3 times in 3 different ways'),
         h5('This one displays each number in a different color depending on its remainder when dived by 3 (just so you can see class updates)'),
