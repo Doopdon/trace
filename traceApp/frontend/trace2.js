@@ -5,7 +5,9 @@ let elementTypes = "a,abbr,acronym,address,applet,area,article,aside,audio,b,bas
 let errors ={
     excessParamsError : "error1",
     noContextError: "error2",
-    afterContentError : "cannot have another parameter after content"
+    afterContentError : "cannot have another parameter after content",
+    attributeNotAlone: "error3",
+    listNotLastError: "error4"
 }
 
 function trace(context){
@@ -15,38 +17,58 @@ function trace(context){
             let params = tedium.processParams(arguments)
             return new ElementObject(params,elementType)
         } 
-    })
+    });
 }
 
+class ElementObjectBase{
+    insertInto($parent,$newElement,$elementToReplace){
+        if($elementToReplace){
+            $parent.insertBefore($newElement,$elementToReplace);
+            $parent.removeChild($elementToReplace);
+        }
+        $parent.appendChild($newElement);
+        this.onInsertFunction && this.onInsertFunction($newElement,this);
+        this.$element = $newElement;
+        this.$parent = $parent;
+        return this.$element;
+    }
+    delete(){
+        this.$parent.removeChild(this.$element);
+        this.onDeleteFunction && this.onDeleteFunction(this.$element,this);
+    }
+    onInsert(onInsertFunction){this.onInsertFunction = onInsertFunction}
+    onDelete(onDeleteFunction){this.onDeleteFunction = onDeleteFunction}
+}
 
-class ElementObject{
+class ElementObject extends ElementObjectBase{
     constructor(params,elementType){
+        super()
         this.elementType = elementType;
         this.content = params.content;
         this.attributes = params.attributes;
     }
-    insertInto($parent,$childToReplace){
-        this.$element = document.createElement(this.elementType);
-        tedium.setAttributes(this.$element,this.attributes);
-        tedium.setContent(this.$element,this.content);
-        if($childToReplace){
-            $parent.insertBefore(this.$element,$childToReplace);
-            $parent.removeChild($childToReplace);
-        }
-        $parent.appendChild(this.$element);
-        this.onCreateFunction && this.onCreateFunction(this.$element,this);
+    insertInto($parent,$elementToReplace){
+        let $element = document.createElement(this.elementType);
+        tedium.setAttributes($element,this.attributes);
+        tedium.setContent($element,this.content);
+        return super.insertInto($parent,$element,$elementToReplace);
     }
-    delete(){
-        this.$element.parentElement.removeChild(this.$element);
-        this.onDeleteFunction && this.onDeleteFunction(this.$element,this);
-    }
-    onCreateReturnElement(onCreateFunction){this.onCreateFunction = onCreateFunction}
-    onDeleteReturnElement(onDeleteFunction){this.onDeleteFunction = onDeleteFunction}
 }
 
-class RenderPropElementObject extends ElementObject{
-    constructor(){}
-    insertInto(parent,childToReplace){}//overrides existing
+class RenderPropElementObject extends ElementObjectBase{
+    constructor(propRef,renderFunction){
+        super()
+        this.__renderFunction = ()=>
+            renderFunction(propRef.get(),propRef);
+    }
+    update(){
+        let $element = this.__renderFunction().insertInto(this.$parent);
+        return super.insertInto(this.$parent,$element,this.$element);
+    }
+    insertInto($parent,$elementToReplace){
+        let $element = this.__renderFunction().insertInto($parent);
+        return super.insertInto($parent,$element,$elementToReplace);
+    }
 }
 
 class RenderListItemElementObject extends ElementObject{
@@ -57,6 +79,7 @@ class RenderListItemElementObject extends ElementObject{
 class RenderListElementObject extends ElementObject{
     constructor(){}
     insertInto(parent,childToReplace){}//overrides existing
+    footer(renderFunction){}
 }
 
 class AttributeObj{
@@ -70,12 +93,12 @@ class AttributeObj{
 
 class RenderBase{
     constructor(){
-        this.__atrFunctions = []
+        this.__attributeObjects = []
         this.__onDeleteFunctions = []
         this.__onChangeFunctions = []
     }
-    __deleteAll(){}
-    __changed(){}
+    __delete(){}
+    __change(){}
     onChange(onChangeFunction){}
     deleteOnChange(onChangeFunction){}
     onDelete(onDeleteFunction){}
@@ -84,18 +107,38 @@ class RenderBase{
     getObjVal(){}
 }
 
+
+
 class RenderProp extends RenderBase{
     constructor(value){
         super();
-        this.__renderIdItr = 0;
-        this.__renders = [];
+        this.__RenderPropElementObjects = [];
         this.__data = value;
     }
-    get(){}
-    set(value){}
-    update(updateFunction){}
-    delete(){}
-    
+    get(){
+        return this.__data;
+    }
+    set(value){
+        this.__data = value;
+        super.__change();
+        this.__RenderPropElementObjects.forEach(x=>x.update())
+    }
+    update(updateFunction){
+        if(updateFunction) 
+            return this.set(updateFunction(this.get()))
+        this.set(this.get());
+    }
+    delete(){
+        super.__delete()
+        this.__RenderPropElementObjects.forEach(x=>x.delete())
+        this.__RenderPropElementObjects = [];
+        this.__data = undefined;
+    }
+    display(renderFunction){
+        let renderPropElement = new RenderPropElementObject(this,renderFunction)
+        this.__RenderPropElementObjects.push(renderPropElement)
+        return renderPropElement;
+    }
 }
 
 class RenderListItem extends RenderProp{
@@ -162,29 +205,40 @@ let tedium = {
             }
         }
     },
-    setAttributes: function(){},
+    setAttributes: function($element,attributes){
+        if(!attributes) return;
+        Object.keys(attributes).forEach(function(key){
+            if(attributes[key].genAtr) return attributes[key].genAtr(key,$element);
+            (typeof attributes[key] == "function") && 
+            ($element[key] = attributes[key]) || 
+            $element.setAttribute(key,attributes[key])
+        });
+    },
     setContent: function ($element,content){
         var lastType = null;
         setContentRecursive(content);  
-        function setContentRecursive(cnt){
-            if(Array.isArray(cnt)) return cnt.forEach(setContentRecursive);
-            checkForError(typeof cnt)
-            if(allowedTypes.includes(typeof cnt)) 
-                return ($element.innerHTML += cnt);
+        function setContentRecursive(content){
+            if(Array.isArray(content)) return content.forEach(setContentRecursive);
+            checkForError(content)
+            if(allowedInnerHTMLTypes.includes(typeof content)) 
+                return ($element.innerHTML += content);
             if(content instanceof Element)
-                return element.appendChild(cnt)
-            cnt.genAtr && 
-            cnt.genAtr('innerHTML',element);
-            cnt.render && cnt.render(element);
+                return $element.appendChild(content)
+            if(content instanceof AttributeObj)
+                content.genAtr('innerHTML',$element);
+            if(content instanceof ElementObjectBase || content instanceof RenderBase)
+                content.insertInto($element);
         }
 
-        function checkForError(ruleType){
-            if(ruleTypesUsed[ruleTypesUsed.length-1] == 'list')
-                throw 'only one list can be used in each element\'s content, and it must be the last item'
-            if(ruleTypesUsed.length && ruleType == 'atrObj' 
-            || ruleTypesUsed[ruleTypesUsed.length-1] == 'atrObj')
-                throw '.atr(...) needs to be the only item in the parent elements content'
-            ruleTypesUsed.push(ruleType)
+        function checkForError(content){
+            if(lastType == AttributeObj) throw errors.attributeNotAlone;
+            if(content instanceof AttributeObj){
+                if(lastType) throw errors.attributeNotAlone;
+                lastType = AttributeObj;
+            }
+            if(lastType == RenderListElementObject) throw errors.listNotLastError;
+            if(content instanceof RenderListElementObject) lastType = RenderListElementObject;
+            lastType = ElementObjectBase;
         }
     }
 }
