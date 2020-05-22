@@ -26,7 +26,9 @@ function server(){
         var filePath = path.join(__dirname+"/../frontend", file);
         var stat = fileSystem.statSync(filePath);
 
-        let fileType = file.split('.')[1];
+        let fileType = file.split('.')[file.split('.').length-1];
+
+        fileType =  {js:'javascript'}[fileType] || fileType;
 
         res.writeHead(200, {
             'Content-Type': 'text/'+fileType,

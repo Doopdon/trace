@@ -1,6 +1,7 @@
 
 var demos = [
     test,
+    tableDemo,
     listDemo,
     intro,
     intoContinued,
@@ -12,12 +13,10 @@ var demos = [
 ]
 
 function test(){
-    var r = new RenderProp(1)
-    var rr = new RenderProp('')
-    r.onChange(x=>rr.update(x=>x+'asdf'))
+    var list = new RenderList([1,2])
     return div([
-        r.display(x=>h1({onclick:x=>r.update(x=>x+1)},x)),
-        rr.display(x=>h1(x))
+        button({onclick:()=>{list.set([1,2,3,4])}},'reset'),
+        list.display(x=>h1(x))
     ])
 }
 
@@ -36,6 +35,38 @@ trace(window)
 var _root = document.getElementById('root');
 app(_root)
 
+
+function tableDemo(){
+
+    var list = new RenderList([{val1:1,val2:'hey'}])
+
+    return div([
+        
+        button({onclick:()=>list.sort((x,y)=>x.val1-y.val1)},'sort'),
+        button({onclick:()=>list.append({val1:1,val2:'hey'})},'add new'),
+        table([
+            tr([
+                th(h3('Value 1')),
+                th(h3('Value 2')),
+                th(),//move up
+                th(),//move down
+                th(),//delete
+                th('index'),
+                th('stress'),
+            ]),
+            list.display((x,rx)=>tr({class:classTest2(x.val1*1)},[
+                rx.display(x=>td(textarea({onchange:e=>rx.update(x=>{x.val1 = e.target.value; return x})},x.val1))), 
+                rx.display(x=>td(textarea({onchange:e=>rx.update(x=>{x.val2 = e.target.value; return x})},x.val2))),
+                td(button({onclick:()=>{list.move(rx.getIndex(),rx.getIndex()-1)}},'move up')),
+                td(button({onclick:()=>{list.move(rx.getIndex(),rx.getIndex()+1)}},'move down')),
+                td(button({onclick:()=>rx.delete()},'delete')),
+                td(rx.index.display(x=>label(x))),
+                td(fourK()),
+            ])),
+        ]),
+        list.display(x=>h1({class:classTest(x.val1*1)},x.val1+'-'+x.val2))
+    ])
+}
 
 
 function listDemo(){
@@ -241,10 +272,26 @@ function atrInEfficientTest(){
 function classTest(x){
     return ['red-text','green-text','blue-text'][x%3]
 }
+function classTest2(x){
+    return ['red','green','blue'][x%3]
+}
 
 function fortyK(){
     var a = [];
     var size = 200
+    for(var i = 0; i < size; i++){
+        var b = []
+        for(var j = 0; j < size; j++){
+            b.push(j)
+        }
+        a.push(b)
+    }
+    return div(a.map(x=>div({class:'column'},x.map(y=>div({class:'point'})))))
+}
+
+function fourK(){
+    var a = [];
+    var size = 64
     for(var i = 0; i < size; i++){
         var b = []
         for(var j = 0; j < size; j++){

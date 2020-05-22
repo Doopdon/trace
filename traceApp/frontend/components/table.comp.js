@@ -1,5 +1,6 @@
+import rowComp from './row.comp.js'
+
 function tableComp(listToRender){//here is a table comp, it takes a render list. it can take whatever the hell you want
-    trace(this);//attach trace functions
     return table([
         tr([
             th('name'),
@@ -11,3 +12,5 @@ function tableComp(listToRender){//here is a table comp, it takes a render list.
         listToRender.display((x,u)=>rowComp(x,u))
     ])
 }
+
+export default tableComp;

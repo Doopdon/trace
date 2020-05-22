@@ -1,7 +1,18 @@
+import tableComp from './components/table.comp.js'
+import coolButton from './components/button.comp.js'
+
+//import * as j from './testImports.js'
+
+console.log('1',this);
+
+trace(window);
 var state = new RenderProp({data:null})//this is the global state. it has a "state" inside it that can be changed independently
 
+
+
+
 function app(root){
-    trace(this);//this attaches all the div/h1/table methods to this function (I do this to avoid polluting the global scope) with 800 3 letter functions
+    console.log(ccc);
     div([//the div function returns a "RenderObject" 
         h1('here is a crud..y app'),
         h5('lol'),
@@ -15,6 +26,7 @@ function app(root){
         )),
     ]).render(root)//all RenderObjects have a "render" function that takes a parent and returns an element
 }
+
 app(document.getElementById('root'))//get the root div and the app will attach its self to it
 
 //this just calls the server to ask for the stuff
@@ -33,15 +45,7 @@ class DataForRendering{
     }
 }
 
-//bunch of crud methods I hacked together not really relevant
-function updateRecord(newItem,callback){
-    fetch('/api/update',{method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body:JSON.stringify(newItem)
-    }).then(r => r.json()).then(callback)
-}
+
 
 function addRecord(callback){
     fetch('/api/add',{method: 'GET'})

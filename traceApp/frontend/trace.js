@@ -117,7 +117,9 @@
             ref.__value =  newValue;
             ref.__runAllAtrFunctions();
             ref.__onChangeEvent();
-            ref.__renders = ref.__renders.filter(function(x){
+            ref.__renders = ref.__renders.filter(filterer);
+            if(ref.__listRenders) ref.__listRenders = ref.__listRenders.filter(filterer)
+            function filterer(x){
                 if(!document.body.contains(x.elem)) {
                     ref.onDeleteRF && ref.onDeleteRF(x.renderFunction)
                     return false;
@@ -126,12 +128,15 @@
                 var newElem = renderObj.render(x.parent,x.elem)
                 x.elem =  newElem;
                 return true;
-            })   
+            }
         }
         ref.deleteAll = function(){
             ref.__atrRenders = [];
             ref.__deleteEvent();
             ref.__renders.forEach(x=>{
+                x.parent.removeChild(x.elem);
+            })
+            ref.__listRenders.forEach(x=>{
                 x.parent.removeChild(x.elem);
             })
         }
@@ -159,21 +164,38 @@
         return ref;
     }
 
-    function makeRenderListItem(renderProp,id,getUtils,onDeleteRF){
+    function makeRenderListItem(renderProp,id,getUtils,onDeleteRF,listRef,index){
         renderProp instanceof RenderProp || (renderProp = new RenderProp(renderProp))
         renderProp.utils = getUtils(renderProp);
         renderProp.id = id;
         renderProp.onDeleteRF = onDeleteRF;
+        renderProp.__listRenders = [];
+        renderProp.index = new RenderProp(index,renderProp.utils)
+        listRef.onChange(x=>renderProp.index.set(renderProp.getIndex()))
+        var listRfId = 0;
+        renderProp.displayInList = function(renderFunction){
+            return {
+                render:function(parent){
+                    var rObj = renderFunction(renderProp.__value,renderProp);
+                    if(!(rObj && rObj.render))
+                        throw "display function did not return a RenderObject. it returned: "+JSON.stringify(rObj)
+                    var elem = rObj.render(parent);
+                    renderProp.__listRenders.push({renderFunction,elem,parent,rfId:listRfId++})
+                    return elem;
+                }
+            }
+        }
         return renderProp
     }
 
     window.RenderList = function(values){
+        if(!Array.isArray(values)) throw 'RenderList requires an array in its constructor'
         var ref = this || {};
         var idItr= 0;
         atrFunctions(ref);
         setupOnChangeEvents(ref);
-        ref.__values = values.map(function(x){ return makeRenderListItem(x,idItr++,getUtils,deleteRF) });
-        ref.__renders = [];
+        ref.__values = values.map(function(x,i){ return makeRenderListItem(x,idItr++,getUtils,deleteRF,ref,i) });
+        ref.__rendersLs = [];
         var rfId = 0;
 
         ref.at = function(index){return ref.__values[index];}
@@ -185,18 +207,18 @@
         ref.append = function(value){ref.insertAt(ref.__values.length,value)}
         ref.insertAt = function(index,value){
             var currentProp = ref.__values[index];
-            var newProp = makeRenderListItem(value,idItr++,getUtils,deleteRF);
+            var newProp = makeRenderListItem(value,idItr++,getUtils,deleteRF,ref,index);
             if(currentProp){
-                ref.__renders.forEach(x=>{
-                    var currentRender = currentProp.__renders.find(r=> r.rfId == x.rfId);
-                    var newElem = newProp.display(x.renderFunction,getUtils(newProp)).render(x.parent);
+                ref.__rendersLs.forEach(x=>{
+                    var currentRender = currentProp.__listRenders.find(r=> r.rfId == x.rfId);
+                    var newElem = newProp.displayInList(x.renderFunction,getUtils(newProp)).render(x.parent);
                     x.parent.insertBefore(newElem,currentRender.elem);
                 })
                 ref.__values.splice(index,0,newProp);
             }
             else{
-                ref.__renders.forEach(x=>{
-                    var elem = newProp.display(x.renderFunction,getUtils(newProp)).render(x.parent)
+                ref.__rendersLs.forEach(x=>{
+                    var elem = newProp.displayInList(x.renderFunction,getUtils(newProp)).render(x.parent)
                     x.footerElms && x.parent.insertBefore(elem,x.footerElms[0]);
                 })
                 ref.__values.splice(index,0,newProp);
@@ -220,9 +242,9 @@
             var footers;
             var render = function(parent,element){
                 element && parent.removeChild(element);
-                ref.__values.forEach(x=>x.display(renderFunction,x).render(parent))
+                ref.__values.forEach(x=>x.displayInList(renderFunction).render(parent))
                 var footerElms = footers && footers.map(function(x){return x.render(parent)});
-                ref.__renders.push({renderFunction,parent,footerElms,rfId:rfId++});
+                ref.__rendersLs.push({renderFunction,parent,footerElms,rfId:rfId++});
             }
             var footer = function(footerRF){
                 footers = footers || []
@@ -247,10 +269,10 @@
             var source = ref.__values[sourceIndex];
             if(!source) throw "index of ["+sourceIndex+"] is out of bounds"
             var dest = ref.__values[destIndex+shifter]; 
-            source.__renders.forEach(function(sr,i){
-                if(dest) sr.parent.insertBefore(sr.elem,dest.__renders[i].elem)
-                else if(ref.__renders[i].footerElms)
-                     sr.parent.insertBefore(sr.elem,ref.__renders[i].footerElms[0])
+            source.__listRenders.forEach(function(sr,i){
+                if(dest) sr.parent.insertBefore(sr.elem,dest.__listRenders[i].elem)
+                else if(ref.__rendersLs[i].footerElms)
+                     sr.parent.insertBefore(sr.elem,ref.__rendersLs[i].footerElms[0])
                 else sr.parent.appendChild(sr.elem);
             })
             ref.__values.splice(sourceIndex,1);
@@ -264,6 +286,11 @@
            if(sortFunction) ref.__values.sort((x,y)=>sortFunction(x.get(),y.get(),x,y))
            else ref.__values.sort();
            ref.__values.forEach(function(){ref.move(0,ref.getLength())})
+        }
+        ref.set = function(array){
+            if(!Array.isArray(values)) throw 'RenderList requires an array in its constructor';
+            while(ref.__values.length) ref.pop();
+            array.forEach(x=>ref.append(x));
         }
         return ref;
 
@@ -280,7 +307,7 @@
         }
 
         function deleteRF(renderFunction){
-            ref.__renders.filter(function(x){x != renderFunction})
+            ref.__rendersLs.filter(function(x){x != renderFunction})
         }
     }
 
@@ -336,22 +363,22 @@
 
 //IT AINT DONE YET
 
-//autocomplete fix for vscode 26
-//todo make trace work on both front and backend 13
+//autocomplete fix for vscode
+//todo make trace work on both front and backend
 //todo rename it "gium" "vestigium" "nishaan" "rastro" "Spur" "harch" "kursdom" "layshon" "sorghum" ???doopdon???
 //todo test on IE ughghghg
 //rename render to insertInto
-//addEventListener thing
 //todo remove at and insert at should not be able to go negative
 //todo add deleteAll function to renderList continued...
-//todo add onchange event and on delete event to props and lists,
 //todo use the "pop" strategy to verify lists, atrs are being used right.
 //todo make atr and events look the same
 //todo rename __value and __values to "__data"
 //todo make better display demo
 //todo add warning or something 444
-//todo add moveto function to utilities
+//todo add moveto function to utilities -----
 //todo add footer error message if you hand in a function
+//todo rename append to push
+//add sort on [prop] ------
 
 //
 //
@@ -360,6 +387,7 @@
 //expected bug not all atrRenders are deleted when renderProp is deleted
 //expected bug footers will not delete with rest of the list
 //bug  r.display(x=>h1({onclick:r.update(x=>x+1)})),  got weird error about genAtr
+// same thing button({onclick:list.sort((x,y)=>x.val1-y.val1)},'sort'),
 
 //widgets:
 //todo add blank html page comp
