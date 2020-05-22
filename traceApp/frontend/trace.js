@@ -382,12 +382,12 @@
 
 //
 //
-//todo test ondelete/change events FAIL
-//bug "trace(this)" pollutes the global scope
 //expected bug not all atrRenders are deleted when renderProp is deleted
 //expected bug footers will not delete with rest of the list
 //bug  r.display(x=>h1({onclick:r.update(x=>x+1)})),  got weird error about genAtr
 // same thing button({onclick:list.sort((x,y)=>x.val1-y.val1)},'sort'),
+//prop.display({},x=>h3(x)), gave me a strange error
+//button({onclick:attr.delete},'delete the attr'), changed "this" inside delete function
 
 //widgets:
 //todo add blank html page comp
