@@ -20,7 +20,11 @@ function trace(context){
 }
 
 class ElementObjectBase{
+    constructor(){
+        this.__childElementObjects = []
+    }
     insertInto($parent,$newElement,$elementToReplace,parentElementObject){
+        parentElementObject && parentElementObject.__childElementObjects.push(this);
         this.__parentElementObject = parentElementObject;
         if($elementToReplace){
             $parent.insertBefore($newElement,$elementToReplace);
@@ -46,12 +50,12 @@ class ElementObject extends ElementObjectBase{
         this.elementType = elementType;
         this.content = params.content;
         this.attributes = params.attributes;
-        this.__childElements = []
+        this.__childElementObjects = []
     }
     insertInto($parent,$elementToReplace,parentElementObject){
         let $element = document.createElement(this.elementType);
         tedium.setAttributes($element,this.attributes);
-        tedium.setContent($element,this.content);
+        tedium.setContent($element,this.content,this);
         return super.insertInto($parent,$element,$elementToReplace,parentElementObject);
     }
 }
@@ -71,41 +75,47 @@ class PropElementObject extends SingleObjectBase{
     }
     update(){
         let $element = this.__renderFunction().insertInto(this.$parent);
-        return super.insertInto(this.$parent,$element,this.$element);
+        return super.insertInto(this.$parent,$element,this.$element,this.__parentElementObject);
     }
-    insertInto($parent,$elementToReplace){
+    insertInto($parent,$elementToReplace,parentElementObject){
         let $element = this.__renderFunction().insertInto($parent);
-        return super.insertInto($parent,$element,$elementToReplace);
+        return super.insertInto($parent,$element,$elementToReplace,parentElementObject);//todo delete self when not on dom
     }
 }
 
 class ListElementObject extends ElementObjectBase{
     constructor(propRef,renderFunction){
         super()
-        this.displayId = propRef.__listElements.length-1
+        this.displayId = propRef.__listElementObjects.length-1
         this.listItems = propRef.__data.map(x=>
             x.__displayInList(renderFunction,this.displayId));
         this.renderFunction = renderFunction;
     }
-    insertInto($parent,$elementToReplace){
+    insertInto($parent,$elementToReplace,parentElementObject){
+        parentElementObject && parentElementObject.__childElementObjects.push(this);
+        this.__parentElementObject = parentElementObject;
         this.$parent = $parent;
         $elementToReplace && $parent.removeChild($elementToReplace) //todo handel list replacement
-        this.listItems.forEach(x=>x.insertInto($parent))
-    }
-    footer(renderFunction){
-
+        this.listItems.forEach(x=>x.insertInto($parent,null,this))
     }
     __resetOrder(){
         
     }
+    get $element(){
+        return this.listItems[0] && this.listItems[0].$element;
+    }
     __insertAt(index,renderListItem){
-        var $child =this.listItems[index] && this.listItems[index].$element
-        let newVal = renderListItem.__displayInList(this.renderFunction,this.displayId).insertInto(this.$parent);
+        var $child = this.listItems[index] && this.listItems[index].$element || tedium.getElementAfterThis(this)
+        let newVal = renderListItem.__displayInList(this.renderFunction,this.displayId)//todo remove display id
+        newVal.insertInto(this.$parent,null,this);
         this.listItems.splice(index,0,newVal);
         if($child) this.$parent.insertBefore(newVal.$element,$child)
     }
     __deleteAt(index){
-
+        let elementObject = this.listItems[index];
+        if(!elementObject) return;
+        elementObject.delete();
+        this.listItems.splice(index,1);
     }
     __move(fromIndex,toIndex){
 
@@ -122,6 +132,7 @@ class AttributeObject extends SingleObjectBase{
         this.update();
     }
     update(){
+        if(!this.$element) return;
         this.$element.removeAttribute(this.key);
         let res = this.__renderFunction();
         if(typeof res == 'function') this.$element[this.key] = res;
@@ -131,6 +142,7 @@ class AttributeObject extends SingleObjectBase{
         this.onInsertFunction && this.onInsertFunction($newElement,this);
     }
     delete(){
+        if(!this.$element) return;
         this.$element.removeAttribute(this.key);
         this.propRef.deleteAtr(this.renderFunction);
     }
@@ -147,7 +159,7 @@ class RenderBase{
     }
     delete(){
         this.__data = undefined;
-        this.onDeleteFunction.forEach(x=>x())
+        this.__onDeleteFunctions.forEach(x=>x())
     }
     onChange(onChangeFunction){
         this.__onChangeFunctions.push(onChangeFunction)
@@ -214,15 +226,15 @@ class RenderProp extends RenderBase{
 class RenderListItem extends RenderProp{
     constructor(listRef,value){
         super(value);
-        this.__listRenderPropElementObjects = {};
+        this.__listRenderPropElementObjects = [];
         this.__id = listRef.__listItemItr++;
         this.listRef = listRef;
     }
     get index(){
-        if(this.index) return this.index;
-        this.index = new RenderProp(this.listRef.__getIndex(this.__id));
+        if(this.__index) return this.__index;
+        this.__index = new RenderProp(this.listRef.__getIndex(this.__id));
         this.listRef.onChange(()=>{this.index.set(this.listRef.__getIndex(this.__id))});
-        return this.index;
+        return this.__index;
     }
     set(value){
         super.set(value);
@@ -230,11 +242,8 @@ class RenderListItem extends RenderProp{
     }
     __displayInList(renderFunction,displayId){
         let renderPropElement = new PropElementObject(this,renderFunction)
-        this.__listRenderPropElementObjects[displayId] = renderPropElement;
+        this.__listRenderPropElementObjects.push(renderPropElement);
         return renderPropElement;
-    }
-    delete(){
-        this.listRef.deleteAt(this.index.get())
     }
     move(index){
         this.listRef.move(this.index.get(),index);
@@ -247,7 +256,7 @@ class RenderList extends RenderBase{
         this.__listItemItr = 0;
         this.__data = values.map((value)=>new RenderListItem(this,value));
         this.__indexMap = tedium.createIndexMap(this.__data);
-        this.__listElements = []
+        this.__listElementObjects = []
     }
     __getIndex(id){
         return this.__indexMap[id];
@@ -256,16 +265,16 @@ class RenderList extends RenderBase{
         var val = new RenderListItem(this,value)
         this.__data.splice(index,0,val);
         this.__indexMap = tedium.createIndexMap(this.__data);
-        this.__listElements.forEach(x=>x.__insertAt(index,val));
+        this.__listElementObjects.forEach(x=>x.__insertAt(index,val));
         super.__triggerChanges();
     }
     deleteAt(index){
         var val = this.__data[index];
-        var currentProp = ref.__values[index];
         this.__data.splice(index,1);
         this.__indexMap = tedium.createIndexMap(this.__data);
         var returnVal =  val.get();
         val.delete();
+        this.__listElementObjects.forEach(x=>x.__deleteAt(index))
         super.__triggerChanges();
         return returnVal;
     }
@@ -279,8 +288,12 @@ class RenderList extends RenderBase{
     prepend(value){
         this.insertAt(0,value);
     }
-    shift(){}
-    pop(){}
+    shift(){
+        return this.deleteAt(0)
+    }
+    pop(){
+        return this.deleteAt(0)
+    }
     sort(){
         super.__triggerChanges();
     }
@@ -297,7 +310,7 @@ class RenderList extends RenderBase{
     }
     display(renderFunction){
         let listElement = new ListElementObject(this,renderFunction);
-        this.__listElements.push(listElement);
+        this.__listElementObjects.push(listElement);
         return listElement;
     }
     insertInto($parent,$elementToReplace){
@@ -361,7 +374,7 @@ let tedium = {
             if(content instanceof AttributeObject)
                 content.generateAttribute('innerHTML',$element);
             if(content instanceof ElementObjectBase || content instanceof RenderBase)
-                content.insertInto($element);
+                content.insertInto($element,null,elementObject);
         }
 
         function checkForError(content){
@@ -374,6 +387,15 @@ let tedium = {
             if(content instanceof ListElementObject) lastType = ListElementObject;
             lastType = ElementObjectBase;
         }
+    },
+    getElementAfterThis(elementObject){
+        var $element;
+        var foundSelf = false;
+        elementObject.__parentElementObject.__childElementObjects.find((x,i)=>{
+            if(foundSelf) return x.$element && ($element = x.$element);
+            if(x === elementObject) return !(foundSelf = true);
+        })
+        return $element;
     }
 }
 
