@@ -1,10 +1,17 @@
 //var t = new ElementWrapperList();
 //t.childWrappers = [h1('working'),h1('omg')];
-//var d = new RenderProp('uuu')
+var d = new RenderProp('red')
+var fn = ()=>alert('asdf')
+d.onChange(fn)
+d.onChange(()=>alert('dddd'))
+d.removeOnChange(fn);
 var list = new RenderList([2,4,3,1])
 div([
-    list.display(x=>h4(x)),
-    //list.display(x=>h3(x)),
+    h1({}).onRender(()=>{}),
+    h1({innerHTML:d.atr()},[]),
+    h1({class:d.atr(),onclick:()=>d.set('blue')},'colorTest'),
+    list.display((x,r)=>h4({onclick:()=>r.delete()},x)),
+    list.display(x=>h3(x)),
 ]).render(document.getElementById('root'))
 list.insertAt(0,1);
 list.insertAt(0,2);
