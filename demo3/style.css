@@ -38,3 +38,13 @@
 .column{
   float: left;
 }
+
+.btn-error{
+  background-color: red;
+}
+.btn-warning{
+  background-color: yellow;
+}
+.btn-neutral{
+  background-color: lightblue;
+}
