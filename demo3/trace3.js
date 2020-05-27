@@ -63,7 +63,7 @@ function traceInit(__scope){
             return $foundElement;
         }
         get $element(){
-            return this.childWrappers[0] && this.childWrappers[0].$element || this.__getFooterElement()
+            return this.childWrappers[0] && this.childWrappers[0].$element;
         }
         insertAt(index,renderProp){
             let $element = this.childWrappers[index] && this.childWrappers[index].$element || this.__getFooterElement()
@@ -139,7 +139,7 @@ function traceInit(__scope){
                 throw {message:'ERROR: Display must receive a function',invalidObject:renderFunction}
         }
         update(updateFunction){
-            updateFunction = updateFunction ?? (x=>x)
+            updateFunction = updateFunction || (x=>x)
             this.set(updateFunction(this.get()));
         }
         getObjectValue(){}
@@ -278,8 +278,8 @@ function traceInit(__scope){
     ///////////////////FUNCTION GENERATION///////////////////////
     function generateElement(elementType,param1,param2,toMany){
         if(toMany) throw {message:`ERROR: ${elementType}(), contained too many parameters`,invalidObj:toMany};
-        var attributes = param2 != null && param1 || null;
-        var content = param2 ?? param1
+        var attributes = param2 != null ? param1 : null;
+        var content = param2 != null ? param2 : param1
         return new ElementWrapper(createElement)
         function createElement(intentionallyUnused,elementWrapperRef){
             let $element = document.createElement(elementType);
@@ -288,7 +288,7 @@ function traceInit(__scope){
             return $element;
             function applyContent(content){
                 if(content == null) return
-                if(content instanceof Array) 
+                if(Array.isArray(content)) 
                     return content.forEach(x=>applyContent(x))
                 if(content instanceof Wrapper)
                     return content.render($element,elementWrapperRef)
