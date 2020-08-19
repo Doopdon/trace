@@ -239,6 +239,7 @@ function traceInit(__scope){
         }
         move(sourceIndex,destIndex,__remap=true){
             console.warn('need to add source, dest index bounds checks')
+            if(sourceIndex === destIndex) return;//no need to continue, the item is where it should be.
             var val = this.renderProps[sourceIndex];
             this.renderProps.splice(sourceIndex,1)
             this.renderProps.splice(destIndex,0,val);
@@ -254,101 +255,26 @@ function traceInit(__scope){
                 return this.sort((x,y,rx,ry)=>this.__betterSort(propGetter(x,rx),propGetter(y,ry),reverse))
             throw {message:`sortOn requires either a string or function as its argument, instead it received ${typeof propGetter}`,invalidObj:propGetter}
         }
-        sort(sortFunction){
-            
-            if(this.renderProps.length <= 1)return
-            sortFunction = sortFunction || this.__betterSort;
-            
-            // var originalOrder = [];
-            // this.renderProps.forEach((x,i)=>{
-            //     originalOrder[i] = x;
-            // });
-            //var values = this.renderProps.map(x=>x.value);
-            var renderPropCopy = [...this.renderProps];
-            renderPropCopy.sort((a,b)=>sortFunction(a.value,b.value));
-            renderPropCopy.forEach((renderProp) => {
-                renderProp.move(0,false)
-            });
-            this.__mapIndexes();
-            this.__changeEvent({type:'sorted',prop:this,sortFunction})
-
-            // function sortFunction(a,b){
-            //     console.log(a.a+','+b.a);
-            //     return (a.a > b.a)? 1:-1;
-
-            // }
-
-
-            debugger;
-            return;
-
-            
-                let length = this.renderProps.length;
-                for (let i = 1; i < length; i++) {
-                    let x = this.renderProps[i];
-                    let j = i - 1;
-                    let y = this.renderProps[j];
-                    while (j >= 0 && sortFunction(x.get(),y.get(),x,y)>0){//this.renderProps[j] > key) {
-                        //this.renderProps[j + 1] = this.renderProps[j];
-                        j = j - 1;
-                    }
-                    this.move(i - 1,j+1)
-                   // this.renderProps[j + 1] = key;
-                }
-                //return inputArr;
-            
-
-
-
-
-            return 
-            for(let i = 1; i < this.renderProps.length; i++){
-                for(let si = 1; si <= i; si++){
-                    var x = this.renderProps[i-si];
-                    var y = this.renderProps[i];
-                    let res = sortFunction(x.get(),y.get(),x,y);
-                    if(res > 0) {
-                        this.move(i,i-si,false);
-                        break;
-                    }
-                }
-            }
-            this.__mapIndexes();
-            this.__changeEvent({type:'sorted',prop:this,sortFunction})
-
-
-           return;
-
-
-
-
-            this.listWrappers.forEach((lw,i)=>{
-                var tempList = [];
-                let $firstElem
-                this.renderProps.forEach((rp,j)=>{ 
-                    rp = this.renderProps[this.renderProps.length-(j+1)]
-                    $firstElem = $firstElem || lw.childWrappers[0].$element;
-                    lw.$parent.insertBefore(rp.wrappers[i].$element,$firstElem);
-                    $firstElem = rp.wrappers[i].$element;
-                    tempList.unshift(rp.wrappers[i])
-                })
-                lw.childWrappers = tempList;
-            })
-            this.__changeEvent({type:'sorted',prop:this,sortFunction})
+        sort(sortFunction){        
+            if(this.renderProps.length <= 1)return//do not sort lists with 1 or less items
+            sortFunction = sortFunction || this.__betterSort;//set the sort function to the parameter, or the custom sort function 'betterSort'
+            var renderPropCopy = [...this.renderProps];//copy the render prop array, so that items can be sorted but not affect the order (yet)
+            renderPropCopy.sort((a,b)=>sortFunction(a.value,b.value));//sort the render props, use the value 
+            renderPropCopy.forEach(renderProp => renderProp.move(0,false))//move all the render props, 1 by 1 to the first position. This will re-order the list.
+            this.__mapIndexes();//re map the indexes so the items can be looked up
+            this.__changeEvent({type:'sorted',prop:this,sortFunction})//trigger the change event.
         }
         __betterSort(x,y,reverse){
-            reverse = reverse? 1 : -1//if reverse is true, set it to -1 otherwise 1. Multiply the result by reverse to reverse the order (if the value is -1)
+            reverse = reverse? 1 : -1//if reverse is true, set it to 1 otherwise -1. Multiply the result by reverse to reverse the order (if the value is -1)
             if(x === y) return 0; //if the values are the same, return 0 (do nothing)
-            if(isNaN(x)){//if x is not a number
-                if(!isNaN(y))//but y is 
-                    return 1*reverse;//make the number 1st
-            }//now that we know they are the same, compare them as the same value
-            return x > y? 1*reverse:-1*reverse;
+            if(isNaN(x)  && !isNaN(y)) return 1*reverse;//if x is a number but 1 is not x is first
+            if(isNaN(y)  && !isNaN(x)) return -1*reverse;//if y is a number but x is not y is first
+            return x > y? 1*reverse:-1*reverse;//this will actually sort the list backwards, but that is because it gets rendered backwards, so it reverses the reverse.
         }
         __mapIndexes(){
-            this.__idMap = {};
-            this.renderProps.forEach((rp,i)=>{
-                this.__idMap[rp.__id] = i
+            this.__idMap = {};//clear the id map
+            this.renderProps.forEach((rp,i)=>{//go through each item
+                this.__idMap[rp.__id] = i//set the map at the 'id' index to the position in the list
             })
         }
     }

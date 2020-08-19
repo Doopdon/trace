@@ -10,10 +10,10 @@ div([
         textarea({onchange:(e)=>y.update(x=>(x.a = e.target.value) && x)},x.a),
         textarea({onchange:(e)=>y.update(x=>(x.b = e.target.value) && x)},x.b)
     ])),
-    // div([
-    //     button('sort-down'),
-    //     button('sort-down')
-    // ]),
+    div([
+        button('sort-down'),
+        button('sort-down')
+    ]),
     // list.display(x=>div([
     //     h3(x.a),
     //     h4(x.b)
