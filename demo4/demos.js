@@ -1,7 +1,7 @@
 
 traceInit(window)
 var demos = [
-    test,
+    //test,
     tableDemo,
     //listDemo,
     intro,
@@ -14,7 +14,11 @@ var demos = [
 ]
 
 function test(){
-    return h1({},0)
+    let t = new RenderProp('hey')
+    return div([
+        h1({innerHTML:t.atr()},[]),
+        button({onclick:()=>t.set('hey you')},'change text')
+    ])
 }
 
 function app(root){
@@ -32,13 +36,13 @@ var _root = document.getElementById('root');
 app(_root)
 
 
-function tableDemo(){
+function tableDemo(){//fields 
 
-    var list = new RenderList([{val1:1,val2:'hey'}])
+    var list = new RenderList([{val1:1,val2:'hey'},{val1:3,val2:'hey'},{val1:2,val2:'hey'}])
 
     return div([
         
-        button({onclick:()=>list.sortOn('val1')},'sort'),
+        button({onclick:()=>list.sortOn(x=>x.val1)},'sort'),
         button({onclick:()=>list.push({val1:1,val2:'hey'})},'add new'),
         table([
             tr([
@@ -49,7 +53,8 @@ function tableDemo(){
                 th(),//delete
                 //th('stress'),
             ]),
-            list.display((x,rx)=>tr({class:classTest2(x.val1*1)},[
+            list.display((x,rx)=>
+            tr({class:classTest2(x.val1*1)},[
                 rx.display(x=>td(textarea({onchange:e=>rx.update(x=>{x.val1 = e.target.value; return x})},x.val1))), 
                 rx.display(x=>td(textarea({onchange:e=>rx.update(x=>{x.val2 = e.target.value; return x})},x.val2))),
                 td(button({onclick:()=>{rx.move(rx.getIndex()-1)}},'move up')),

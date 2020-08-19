@@ -99,6 +99,7 @@ function traceInit(__scope){
             this.rProp = rProp;
         }
         update(){
+            if(!this.$element) return;
             let val = this.renderFunction(this.rProp.get(),this.rProp)
             if(this.atrName === 'innerHTML') 
                 return (this.$element.innerHTML = val)
@@ -170,6 +171,7 @@ function traceInit(__scope){
         constructor(value,parent){
             super(value);
             this.parentRenderList = parent;
+            this.__id = parent.idItr++;
         }
         delete(){
             this.parentRenderList.deleteAt(this.getIndex())
@@ -178,6 +180,7 @@ function traceInit(__scope){
             this.parentRenderList.move(this.getIndex(),index)
         }
         getIndex(){
+            //return this.parentRenderList.__idMap[this.__id];
             let ind;
             this.parentRenderList.renderProps.find((x,i)=>x===this && (ind = i));
             return ind;
@@ -187,15 +190,18 @@ function traceInit(__scope){
     class RenderList extends Prop{
         constructor(values){
             super();
+            this.idItr = 0;
             this.renderProps = values.map(x=>new RenderListProp(x,this));
+            this.__mapIndexes();
             this.listWrappers = [];
         }
         get(){
             return this.renderProps.map(x=>x.value);
         }
         set(newArray){
-            this.renderProps.forEach(()=>this.deleteAt(0))
-            newArray.forEach(x=>this.insertAt(0,x))
+            this.renderProps.forEach(()=>this.deleteAt(0,false))
+            newArray.forEach(x=>this.insertAt(0,x,false))
+            this.__mapIndexes();
         }
         display(renderFunction){
             super.display(renderFunction);
@@ -209,11 +215,12 @@ function traceInit(__scope){
         unshift(value){
             this.insertAt(0,value)
         }
-        insertAt(index,value){
+        insertAt(index,value,__remap = true){
             index = Math.min(index,this.renderProps.length);
             let rProp = new RenderListProp(value,this)
             this.listWrappers.forEach(x=>x.insertAt(index,rProp))
             this.renderProps.splice(index,0,rProp);
+            __remap && this.__mapIndexes();
             this.__changeEvent({type:'index-inserted',prop:this,index,value})
         }
         pop(){
@@ -222,19 +229,21 @@ function traceInit(__scope){
         shift(){
             return this.deleteAt(0)
         }
-        deleteAt(index){
+        deleteAt(index, __remap = true){
             this.listWrappers.forEach(x=>x.deleteAt(index))
             let val = this.renderProps[index].get();
             this.renderProps.splice(index,1);
+            __remap && this.__mapIndexes();
             this.__changeEvent({type:'index-deleted',prop:this,index})
             return val;
         }
-        move(sourceIndex,destIndex){
+        move(sourceIndex,destIndex,__remap=true){
             console.warn('need to add source, dest index bounds checks')
             var val = this.renderProps[sourceIndex];
             this.renderProps.splice(sourceIndex,1)
             this.renderProps.splice(destIndex,0,val);
             this.listWrappers.forEach(x=>x.move(sourceIndex,destIndex));
+            __remap && this.__mapIndexes();
             this.__changeEvent({type:'index-moved',prop:this,sourceIndex,destIndex})
         }
         sortOn(propGetter,reverse){//todo test this
@@ -242,12 +251,76 @@ function traceInit(__scope){
             if(typeof propGetter === 'string') 
                 return this.sort((x,y)=>this.__betterSort(x[propGetter],y[propGetter],reverse));
             if(typeof propGetter === 'function')
-                throw this.sort((x,y,rx,ry)=>this.__betterSort(propGetter(x,rx),propGetter(y,ry),reverse))
+                return this.sort((x,y,rx,ry)=>this.__betterSort(propGetter(x,rx),propGetter(y,ry),reverse))
             throw {message:`sortOn requires either a string or function as its argument, instead it received ${typeof propGetter}`,invalidObj:propGetter}
         }
         sort(sortFunction){
+            
+            if(this.renderProps.length <= 1)return
             sortFunction = sortFunction || this.__betterSort;
-            this.renderProps.sort((x,y)=>sortFunction(x.get(),y.get(),x,y))
+            
+            // var originalOrder = [];
+            // this.renderProps.forEach((x,i)=>{
+            //     originalOrder[i] = x;
+            // });
+            //var values = this.renderProps.map(x=>x.value);
+            var renderPropCopy = [...this.renderProps];
+            renderPropCopy.sort((a,b)=>sortFunction(a.value,b.value));
+            renderPropCopy.forEach((renderProp) => {
+                renderProp.move(0,false)
+            });
+            this.__mapIndexes();
+            this.__changeEvent({type:'sorted',prop:this,sortFunction})
+
+            // function sortFunction(a,b){
+            //     console.log(a.a+','+b.a);
+            //     return (a.a > b.a)? 1:-1;
+
+            // }
+
+
+            debugger;
+            return;
+
+            
+                let length = this.renderProps.length;
+                for (let i = 1; i < length; i++) {
+                    let x = this.renderProps[i];
+                    let j = i - 1;
+                    let y = this.renderProps[j];
+                    while (j >= 0 && sortFunction(x.get(),y.get(),x,y)>0){//this.renderProps[j] > key) {
+                        //this.renderProps[j + 1] = this.renderProps[j];
+                        j = j - 1;
+                    }
+                    this.move(i - 1,j+1)
+                   // this.renderProps[j + 1] = key;
+                }
+                //return inputArr;
+            
+
+
+
+
+            return 
+            for(let i = 1; i < this.renderProps.length; i++){
+                for(let si = 1; si <= i; si++){
+                    var x = this.renderProps[i-si];
+                    var y = this.renderProps[i];
+                    let res = sortFunction(x.get(),y.get(),x,y);
+                    if(res > 0) {
+                        this.move(i,i-si,false);
+                        break;
+                    }
+                }
+            }
+            this.__mapIndexes();
+            this.__changeEvent({type:'sorted',prop:this,sortFunction})
+
+
+           return;
+
+
+
 
             this.listWrappers.forEach((lw,i)=>{
                 var tempList = [];
@@ -264,14 +337,19 @@ function traceInit(__scope){
             this.__changeEvent({type:'sorted',prop:this,sortFunction})
         }
         __betterSort(x,y,reverse){
-            reverse = reverse? -1 : 1
-            if(x === y) return 0; 
-            if(!isNaN(x)){
-            if(!isNaN(y)) return (x-y)*reverse;
-            return -1*reverse;
-            }
-            if(!isNaN(y)) return 1*reverse;
+            reverse = reverse? 1 : -1//if reverse is true, set it to -1 otherwise 1. Multiply the result by reverse to reverse the order (if the value is -1)
+            if(x === y) return 0; //if the values are the same, return 0 (do nothing)
+            if(isNaN(x)){//if x is not a number
+                if(!isNaN(y))//but y is 
+                    return 1*reverse;//make the number 1st
+            }//now that we know they are the same, compare them as the same value
             return x > y? 1*reverse:-1*reverse;
+        }
+        __mapIndexes(){
+            this.__idMap = {};
+            this.renderProps.forEach((rp,i)=>{
+                this.__idMap[rp.__id] = i
+            })
         }
     }
 

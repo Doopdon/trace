@@ -1,6 +1,22 @@
 trace(window)
 
-h1({},{}).insertInto(document.getElementById('root'))
+
+let t = new RenderList([1,2,3,4,5])
+
+
+// div(
+// {},
+// [
+//     t.display((x,y)=>div([
+//         textarea({onchange:x=>y.set(x)},x),
+//         h5(x)
+//     ]))
+// ]
+var val = 'asdf';
+div(
+    textarea(val),
+    h3(val)
+).insertInto(document.getElementById('root'))
 
 // var prop = new RenderProp({a:0})
 // var attr = prop.atr(classTest)
