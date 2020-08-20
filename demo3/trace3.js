@@ -1,78 +1,82 @@
 function traceInit(__scope){
 ////////////////////////////WRAPPERS//////////////////////////////
+    //base class for wrapper objects Wrappers are not to be used directly by the user.
     class Wrapper{
         constructor(){
-            this.onRenderFunction = null;
+            this.onRenderFunction = null;//this is the default value for the 'onRenderFunction' which is called when the element is added
+            this.hidden = false;
         }
-        addChild(childWrapper){
+        addChild(childWrapper){//when a child element is added it kept in the 'childWrapper' list
             this.childWrappers.push(childWrapper)
         }
-        removeChild(childWrapper){
+        removeChild(childWrapper){//when an element is removed, it needs to be removed from the 'childWrapper' list as well as from the HTML
             this.childWrappers = this.childWrappers.filter(x=>x !== childWrapper);
         }
-        onRenderEvent(){
+        onRenderEvent(){//when the element is added to the dom, call this function, pas in the element and the wrapper to the function (that way the user has access to the element reference)
             this.onRenderFunction && this.onRenderFunction(this.$element,this);
         }
-        onRender(onRenderFunction){
+        onRender(onRenderFunction){//this is the call that adds an 'onRenderFunction' is added to the wrapper
             this.onRenderFunction = onRenderFunction;
-            delete this.onRender;
+            delete this.onRender; //TODO see if I can get rid of this. 76767
         }
     }
 
+    //Element wrapper holds a reference to an HTML element, and to its parent and child element wrappers.
     class ElementWrapper extends Wrapper{
         constructor(renderFunction){
             super();
-            this.renderFunction = renderFunction;
-            this.childWrappers = [];
-            this.$element = null;
+            this.renderFunction = renderFunction;//each element wrapper has a render function that creates an element
+            this.$element = null;//The created element is stored here 
+            this.childWrappers = [];//Holds a list of all the chid element wrappers so traversal can happen.
         }    
-        update(){
-            if(!document.contains(this.$parent)) return false
-            this.parentWrapper.removeChild(this)
-            this.render(this.$parent,this.parentWrapper)
+        update(){//1234 when something is changed, the render function needs to be re run.
+            if(!document.contains(this.$parent)) return false;//if the parent is not on the document the wrapper needs to be removed from memory. (false indicates it is not on the dom)
+            this.parentWrapper.removeChild(this);//additional processing needs to happen when a wrapper is deleted. so the base.removeChild function is called.
+            this.render(this.$parent,this.parentWrapper);//
             return true;
         }
-        render($parent,parentWrapper){
+        render($parent,parentWrapper){//takes a parent element and parent wrapper (list wrapper does not contain an element. it does have a parent element.)
+            if(this.__hidden) return;
             this.$parent = $parent;
-            this.parentWrapper = parentWrapper;
-            parentWrapper && parentWrapper.addChild(this);
-            let $element = this.renderFunction($parent,this);   
-            if(!this.$element) $parent.appendChild($element);
-            else{
-                $parent.insertBefore($element,this.$element)
-                $parent.removeChild(this.$element)
+            this.parentWrapper = parentWrapper;//set the parent and parent wrapper for this wrapper
+            parentWrapper && parentWrapper.addChild(this);//add itself to the parents children
+            let $element = this.renderFunction($parent,this);//use the render function to generate an element and insert it into the parent
+            if(!this.$element) $parent.appendChild($element);//if a rendered element does not exist, simply append it to the parent
+            else{//if there is a referenced element, 
+                $parent.insertBefore($element,this.$element);//the new element needs to be appended before the old one
+                $parent.removeChild(this.$element);//remove the old element
             }
-            return (this.$element = $element);
+            return (this.$element = $element);//set the element reference to the new element todo 2232 see if I can get rid of the return
         }
     }
-
+    //List wrappers do not hold an element reference, just a parent. They reuse the given render function for each item in the renderProps parameter
     class ElementWrapperList extends Wrapper{
         constructor(renderFunction,renderProps){
             super();
-            this.renderFunction = renderFunction;
-            this.__initialChildWrappers = renderProps.map(x=>x.display(renderFunction));
-            this.childWrappers = [];
+            this.renderFunction = renderFunction;//set the render function for this list
+            this.__initialChildWrappers = renderProps.map(x=>x.display(renderFunction));//get every wrapper for each render prop.
+            this.childWrappers = [];//holds a reference to all the child wrappers in the list
         }
-        __getFooterElement(){
+        __getFooterElement(){//finds the first element no in the list, so elements can be inserted before it
             let foundSelf = false;
             let $foundElement;
-            this.parentWrapper.childWrappers.find(x=>{
-                if(foundSelf) return !!($foundElement = x.$element)
-                if(x === this) foundSelf = true; return false;
+            this.parentWrapper.childWrappers.find(x=>{//find this wrapper reference in the parents children
+                if(foundSelf) return !!($foundElement = x.$element)//if the self has been found return the next wrapper
+                if(x === this) foundSelf = true; return false;//if the current wrapper is self, then set found self to true, return false, the next element is the element after
             })
-            return $foundElement;
+            return $foundElement;//return the found element if it exists
         }
-        get $element(){
+        get $element(){//return the first element, if it exists
             return this.childWrappers[0] && this.childWrappers[0].$element;
         }
-        insertAt(index,renderProp){
-            let $element = this.childWrappers[index] && this.childWrappers[index].$element || this.__getFooterElement()
-            let newWrapper = renderProp.display(this.renderFunction)
-            let $newElement = newWrapper.render(this.$parent,this);
-            this.childWrappers.splice(index,0,this.childWrappers.pop());
-            $element && this.$parent.insertBefore($newElement,$element) || this.$parent.appendChild($newElement)
+        insertAt(index,renderProp){//insert an item (render prop) at the given index
+            let $element = this.childWrappers[index] && this.childWrappers[index].$element || this.__getFooterElement()//find the element at the index, or find the footer if there is none.
+            let newWrapper = renderProp.display(this.renderFunction);//create a new wrapper with the renderFunction
+            let $newElement = newWrapper.render(this.$parent,this);//hand in the parent, and render the element. hand in the reference to the list (this) so the parent wrapper can be set.
+            this.childWrappers.splice(index,0,this.childWrappers.pop());//the wrapper needs to be inserted into the list, but its already at the end, so its popped off and then inserted
+            $element && this.$parent.insertBefore($newElement,$element) || this.$parent.appendChild($newElement)//if the footer element exists append before it, or just append to the parent
         }
-        deleteAt(index){
+        deleteAt(index){//
             let $elementToDelete = this.childWrappers[index] && this.childWrappers[index].$element;
             if(!$elementToDelete) throw {message:`ERROR: Cannot delete element because none was found at index [${index}].`,invalidObject:this.childWrappers}
             this.childWrappers.splice(index,1);
@@ -117,6 +121,7 @@ function traceInit(__scope){
         constructor(){
             this.attributeInserts = [];
             this.changeEvents = [];
+            this.__hidden = false;
         }
         atr(renderFunction){
             let atrInsert = new AttributeInsert(renderFunction,this);
@@ -143,7 +148,7 @@ function traceInit(__scope){
             updateFunction = updateFunction || (x=>x)
             this.set(updateFunction(this.get()));
         }
-        getObjectValue(){}
+        getObjectValue(){}//todo
         static toRenderProp(){}
     }
 
@@ -152,6 +157,7 @@ function traceInit(__scope){
             super();
             this.value = value
             this.wrappers = [];
+            this.hidden = false;
         }
         set(value){
             this.value = value;
@@ -164,6 +170,22 @@ function traceInit(__scope){
             let newWrapper = new ElementWrapper((p,ref)=>renderFunction(this.value,this).render(p,ref))
             this.wrappers.push(newWrapper);
             return newWrapper;
+        }
+        hide(){
+            this.hidden = true;
+            this.wrappers.forEach(wrapper => {
+                wrapper.__savedRenderFunction =  wrapper.renderFunction;
+                wrapper.renderFunction = (p,ref)=>div({style:'display: none !important'},'').render(p,ref)
+                wrapper.update()
+            });      
+        }
+        show(){
+            this.hidden = false;
+            this.wrappers.forEach(wrapper => {
+                wrapper.renderFunction =  wrapper.__savedRenderFunction;
+                delete wrapper.__savedRenderFunction
+                wrapper.update()
+            })
         }
     }
 
@@ -250,25 +272,52 @@ function traceInit(__scope){
         sortOn(propGetter,reverse){//todo test this
             if(!['undefined','null','boolean'].includes(typeof reverse)) throw `reverse parameter must be type bool, instead received: '${typeof reverse}'`
             if(typeof propGetter === 'string') 
-                return this.sort((x,y)=>this.__betterSort(x[propGetter],y[propGetter],reverse));
+                return this.sort((x,y)=>this.__customSort(x[propGetter],y[propGetter],reverse));
             if(typeof propGetter === 'function')
-                return this.sort((x,y,rx,ry)=>this.__betterSort(propGetter(x,rx),propGetter(y,ry),reverse))
+                return this.sort((x,y,rx,ry)=>this.__customSort(propGetter(x,rx),propGetter(y,ry),reverse))
             throw {message:`sortOn requires either a string or function as its argument, instead it received ${typeof propGetter}`,invalidObj:propGetter}
         }
         sort(sortFunction){        
             if(this.renderProps.length <= 1)return//do not sort lists with 1 or less items
-            sortFunction = sortFunction || this.__betterSort;//set the sort function to the parameter, or the custom sort function 'betterSort'
+            sortFunction = sortFunction || this.__customSort;//set the sort function to the parameter, or the custom sort function 'betterSort'
             var renderPropCopy = [...this.renderProps];//copy the render prop array, so that items can be sorted but not affect the order (yet)
             renderPropCopy.sort((a,b)=>sortFunction(a.value,b.value));//sort the render props, use the value 
             renderPropCopy.forEach(renderProp => renderProp.move(0,false))//move all the render props, 1 by 1 to the first position. This will re-order the list.
             this.__mapIndexes();//re map the indexes so the items can be looked up
             this.__changeEvent({type:'sorted',prop:this,sortFunction})//trigger the change event.
         }
-        __betterSort(x,y,reverse){
+        removeWhen(removeFunction){
+            let deleteList = [];
+            this.renderProps.forEach(x=>{
+                if(removeFunction(x.value)) deleteList.push(x)
+            });
+            deleteList.forEach(renderProp => renderProp.delete());
+        }
+        hideWhen(hideFunction){
+            this.renderProps.forEach(x=>{
+                if(hideFunction(x.value)) x.hide();
+            });
+        }
+        showWhen(showFunction){
+            this.renderProps.forEach(x=>{
+                if(showFunction(x.value)) x.show();
+            });
+        }
+        showAll(){this.showWhen(x=>true)}
+        get numberShown(){
+            let count = 0
+            this.renderProps.forEach(prop => {
+                if(prop.hidden) count++;
+            });
+            return count;
+        }
+        __customSort(x,y,reverse){
             reverse = reverse? 1 : -1//if reverse is true, set it to 1 otherwise -1. Multiply the result by reverse to reverse the order (if the value is -1)
             if(x === y) return 0; //if the values are the same, return 0 (do nothing)
-            if(isNaN(x)  && !isNaN(y)) return 1*reverse;//if x is a number but 1 is not x is first
+            if(isNaN(x)  && !isNaN(y)) return 1*reverse;//if x is a number but y is not x is first
             if(isNaN(y)  && !isNaN(x)) return -1*reverse;//if y is a number but x is not y is first
+            if(!isNaN(x)) x=x*1;//turn string like numbers into real numbers
+            if(!isNaN(y)) y=y*1;//same
             return x > y? 1*reverse:-1*reverse;//this will actually sort the list backwards, but that is because it gets rendered backwards, so it reverses the reverse.
         }
         __mapIndexes(){
@@ -319,9 +368,55 @@ function traceInit(__scope){
     exp.RenderProp = RenderProp;
     exp.RenderList = RenderList;
     const allElementNames = "a,abbr,acronym,address,applet,area,article,aside,audio,b,base,basefont,bb,bdo,big,blockquote,body,br,button,canvas,caption,center,cite,code,col,colgroup,command,datagrid,datalist,dd,del,details,dfn,dialog,dir,div,dl,dt,em,embed,eventsource,fieldset,figcaption,figure,font,footer,form,frame,frameset,h1,h2,h3,h4,h5,h6,head,header,hgroup,hr,html,i,iframe,img,input,ins,isindex,kbd,keygen,label,legend,li,link,map,mark,menu,meta,meter,nav,noframes,noscript,object,ol,optgroup,option,output,p,param,pre,progress,q,rp,rt,ruby,s,samp,script,section,select,small,source,span,strike,strong,style,sub,sup,table,tbody,td,textarea,tfoot,th,thead,time,title,tr,track,tt,u,ul,var,video,wbr"
-    allElementNames.split(',').forEach(t=>exp[t] = (attr,content,tm)=>generateElement(t,attr,content,tm));
+    allElementNames.split(',').forEach(elementName=>exp[elementName] = (attr,content,toMany)=>generateElement(elementName,attr,content,toMany));
     return exp;
 }
 //export default traceInit;
 
 //todo sort on dates
+
+//todo see if I can get rid of the update 1234
+//2232
+//76767
+
+//todo have render take a query string so i dont have to do document.getelementbyid
+
+//todo do an extra parameter on hide, show and remove. it the hide function should take the value and the render function
+
+//todo make the divs not there, not just invisible. when hidden.
+
+// hideWhen(hideFunction){
+//     this.renderProps.forEach(x=>{
+//         if(hideFunction(x.value)) x.unRender();
+//     });
+// }
+// showWhen(showFunction){
+//     let length = this.renderProps;
+//     let lastShown = null;
+//     for(let i = length-1; i>=0; i--){//go through the list of renderProps backwards
+//         var renderProp = this.renderProps[i];
+//         if(!renderProp.__hidden){//if one is not hidden, it is saved so an element can be inserted before.
+//             lastShown = renderProp.$element//save the last render prop that is still visible.
+//         }
+//         else{
+//             if(!showFunction(renderProp.value)) continue;//if the render prop does not pass the showFunction criteria skip it.
+//             renderProp.__hidden = false;
+//             if(!lastShown){//if there is no 'last shown' render prop it needs to be added to the end of the list wrapper,
+//                 this.listWrappers.forEach((lw)=>showLastElemInWrapper(lw,renderProp));
+//             }
+//             else{//otherwise it just needs to be added before the last shown render prop
+//                 $newElem
+//             }
+//         }
+//     }
+
+//     function showLastElemInWrapper(wrapper, renderProp){
+//         var $newElem = renderProp.render(wrapper.$parent);
+//         var $footer = wrapper.__getFooterElement();//try and get the footer element
+//         if($footer) wrapper.$parent.insertBefore($newElem,$footer)//if the footer exists add before it
+//         else wrapper.$parent.appendChild($newElem);
+//     }
+// }
+// showAll(){
+//     this.renderProps.forEach(x=>x.reRender());
+// }
