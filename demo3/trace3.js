@@ -48,15 +48,6 @@ function traceInit(__scope){
             }
             return (this.$element = $element);//set the element reference to the new element todo 2232 see if I can get rid of the return
         }
-        unRender(){
-            this.hidden = true;
-            this.$parent.removeChild(this.$element);
-            this.$element = null;
-        }
-        reRender(){
-            this.hidden = false;
-            this.update();
-        }
     }
     //List wrappers do not hold an element reference, just a parent. They reuse the given render function for each item in the renderProps parameter
     class ElementWrapperList extends Wrapper{
@@ -166,6 +157,7 @@ function traceInit(__scope){
             super();
             this.value = value
             this.wrappers = [];
+            this.hidden = false;
         }
         set(value){
             this.value = value;
@@ -178,6 +170,22 @@ function traceInit(__scope){
             let newWrapper = new ElementWrapper((p,ref)=>renderFunction(this.value,this).render(p,ref))
             this.wrappers.push(newWrapper);
             return newWrapper;
+        }
+        hide(){
+            this.hidden = true;
+            this.wrappers.forEach(wrapper => {
+                wrapper.__savedRenderFunction =  wrapper.renderFunction;
+                wrapper.renderFunction = (p,ref)=>div({style:'display: none !important'},'').render(p,ref)
+                wrapper.update()
+            });      
+        }
+        show(){
+            this.hidden = false;
+            this.wrappers.forEach(wrapper => {
+                wrapper.renderFunction =  wrapper.__savedRenderFunction;
+                delete wrapper.__savedRenderFunction
+                wrapper.update()
+            })
         }
     }
 
@@ -264,14 +272,14 @@ function traceInit(__scope){
         sortOn(propGetter,reverse){//todo test this
             if(!['undefined','null','boolean'].includes(typeof reverse)) throw `reverse parameter must be type bool, instead received: '${typeof reverse}'`
             if(typeof propGetter === 'string') 
-                return this.sort((x,y)=>this.__betterSort(x[propGetter],y[propGetter],reverse));
+                return this.sort((x,y)=>this.__customSort(x[propGetter],y[propGetter],reverse));
             if(typeof propGetter === 'function')
-                return this.sort((x,y,rx,ry)=>this.__betterSort(propGetter(x,rx),propGetter(y,ry),reverse))
+                return this.sort((x,y,rx,ry)=>this.__customSort(propGetter(x,rx),propGetter(y,ry),reverse))
             throw {message:`sortOn requires either a string or function as its argument, instead it received ${typeof propGetter}`,invalidObj:propGetter}
         }
         sort(sortFunction){        
             if(this.renderProps.length <= 1)return//do not sort lists with 1 or less items
-            sortFunction = sortFunction || this.__betterSort;//set the sort function to the parameter, or the custom sort function 'betterSort'
+            sortFunction = sortFunction || this.__customSort;//set the sort function to the parameter, or the custom sort function 'betterSort'
             var renderPropCopy = [...this.renderProps];//copy the render prop array, so that items can be sorted but not affect the order (yet)
             renderPropCopy.sort((a,b)=>sortFunction(a.value,b.value));//sort the render props, use the value 
             renderPropCopy.forEach(renderProp => renderProp.move(0,false))//move all the render props, 1 by 1 to the first position. This will re-order the list.
@@ -285,10 +293,28 @@ function traceInit(__scope){
             });
             deleteList.forEach(renderProp => renderProp.delete());
         }
-        __betterSort(x,y,reverse){
+        hideWhen(hideFunction){
+            this.renderProps.forEach(x=>{
+                if(hideFunction(x.value)) x.hide();
+            });
+        }
+        showWhen(showFunction){
+            this.renderProps.forEach(x=>{
+                if(showFunction(x.value)) x.show();
+            });
+        }
+        showAll(){this.showWhen(x=>true)}
+        get numberShown(){
+            let count = 0
+            this.renderProps.forEach(prop => {
+                if(prop.hidden) count++;
+            });
+            return count;
+        }
+        __customSort(x,y,reverse){
             reverse = reverse? 1 : -1//if reverse is true, set it to 1 otherwise -1. Multiply the result by reverse to reverse the order (if the value is -1)
             if(x === y) return 0; //if the values are the same, return 0 (do nothing)
-            if(isNaN(x)  && !isNaN(y)) return 1*reverse;//if x is a number but 1 is not x is first
+            if(isNaN(x)  && !isNaN(y)) return 1*reverse;//if x is a number but y is not x is first
             if(isNaN(y)  && !isNaN(x)) return -1*reverse;//if y is a number but x is not y is first
             if(!isNaN(x)) x=x*1;//turn string like numbers into real numbers
             if(!isNaN(y)) y=y*1;//same
@@ -353,7 +379,11 @@ function traceInit(__scope){
 //2232
 //76767
 
+//todo have render take a query string so i dont have to do document.getelementbyid
+
 //todo do an extra parameter on hide, show and remove. it the hide function should take the value and the render function
+
+//todo make the divs not there, not just invisible. when hidden.
 
 // hideWhen(hideFunction){
 //     this.renderProps.forEach(x=>{
