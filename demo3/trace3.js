@@ -4,6 +4,7 @@ function traceInit(__scope){
     class Wrapper{
         constructor(){
             this.onRenderFunction = null;//this is the default value for the 'onRenderFunction' which is called when the element is added
+            this.hidden = false;
         }
         addChild(childWrapper){//when a child element is added it kept in the 'childWrapper' list
             this.childWrappers.push(childWrapper)
@@ -35,6 +36,7 @@ function traceInit(__scope){
             return true;
         }
         render($parent,parentWrapper){//takes a parent element and parent wrapper (list wrapper does not contain an element. it does have a parent element.)
+            if(this.__hidden) return;
             this.$parent = $parent;
             this.parentWrapper = parentWrapper;//set the parent and parent wrapper for this wrapper
             parentWrapper && parentWrapper.addChild(this);//add itself to the parents children
@@ -45,6 +47,15 @@ function traceInit(__scope){
                 $parent.removeChild(this.$element);//remove the old element
             }
             return (this.$element = $element);//set the element reference to the new element todo 2232 see if I can get rid of the return
+        }
+        unRender(){
+            this.hidden = true;
+            this.$parent.removeChild(this.$element);
+            this.$element = null;
+        }
+        reRender(){
+            this.hidden = false;
+            this.update();
         }
     }
     //List wrappers do not hold an element reference, just a parent. They reuse the given render function for each item in the renderProps parameter
@@ -119,6 +130,7 @@ function traceInit(__scope){
         constructor(){
             this.attributeInserts = [];
             this.changeEvents = [];
+            this.__hidden = false;
         }
         atr(renderFunction){
             let atrInsert = new AttributeInsert(renderFunction,this);
@@ -145,7 +157,7 @@ function traceInit(__scope){
             updateFunction = updateFunction || (x=>x)
             this.set(updateFunction(this.get()));
         }
-        getObjectValue(){}
+        getObjectValue(){}//todo
         static toRenderProp(){}
     }
 
@@ -266,8 +278,13 @@ function traceInit(__scope){
             this.__mapIndexes();//re map the indexes so the items can be looked up
             this.__changeEvent({type:'sorted',prop:this,sortFunction})//trigger the change event.
         }
-        removeOn(){}
-        hideOn(){}
+        removeWhen(removeFunction){
+            let deleteList = [];
+            this.renderProps.forEach(x=>{
+                if(removeFunction(x.value)) deleteList.push(x)
+            });
+            deleteList.forEach(renderProp => renderProp.delete());
+        }
         __betterSort(x,y,reverse){
             reverse = reverse? 1 : -1//if reverse is true, set it to 1 otherwise -1. Multiply the result by reverse to reverse the order (if the value is -1)
             if(x === y) return 0; //if the values are the same, return 0 (do nothing)
@@ -335,3 +352,41 @@ function traceInit(__scope){
 //todo see if I can get rid of the update 1234
 //2232
 //76767
+
+//todo do an extra parameter on hide, show and remove. it the hide function should take the value and the render function
+
+// hideWhen(hideFunction){
+//     this.renderProps.forEach(x=>{
+//         if(hideFunction(x.value)) x.unRender();
+//     });
+// }
+// showWhen(showFunction){
+//     let length = this.renderProps;
+//     let lastShown = null;
+//     for(let i = length-1; i>=0; i--){//go through the list of renderProps backwards
+//         var renderProp = this.renderProps[i];
+//         if(!renderProp.__hidden){//if one is not hidden, it is saved so an element can be inserted before.
+//             lastShown = renderProp.$element//save the last render prop that is still visible.
+//         }
+//         else{
+//             if(!showFunction(renderProp.value)) continue;//if the render prop does not pass the showFunction criteria skip it.
+//             renderProp.__hidden = false;
+//             if(!lastShown){//if there is no 'last shown' render prop it needs to be added to the end of the list wrapper,
+//                 this.listWrappers.forEach((lw)=>showLastElemInWrapper(lw,renderProp));
+//             }
+//             else{//otherwise it just needs to be added before the last shown render prop
+//                 $newElem
+//             }
+//         }
+//     }
+
+//     function showLastElemInWrapper(wrapper, renderProp){
+//         var $newElem = renderProp.render(wrapper.$parent);
+//         var $footer = wrapper.__getFooterElement();//try and get the footer element
+//         if($footer) wrapper.$parent.insertBefore($newElem,$footer)//if the footer exists add before it
+//         else wrapper.$parent.appendChild($newElem);
+//     }
+// }
+// showAll(){
+//     this.renderProps.forEach(x=>x.reRender());
+// }

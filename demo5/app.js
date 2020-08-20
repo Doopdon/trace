@@ -14,10 +14,9 @@ div([
         button({onclick:()=>sortList('a',true)},'sort-up'),
         button({onclick:()=>sortList('b',true)},'sort-up')
     ]),
-    // list.display(x=>div([
-    //     h3(x.a),
-    //     h4(x.b)
-    // ]))
+    button({onclick:()=>{list.removeWhen(x=>x.a > 1980)}},'remove'),
+    button({onclick:()=>{list.hideWhen(x=>x.a > 1980)}},'hide'),
+    button({onclick:()=>{list.showWhen(x=>x.a > 1980)}},'show'),
 ]).render(document.getElementById('root'))
 
 function sortList(prop,backwards){
