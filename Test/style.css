@@ -1,0 +1,41 @@
+:root{
+    --green: hsl(100, 64%, 86%);
+    --green--b: hsl(100, 41%, 76%);
+}
+
+.tripleColumn-layout{
+    height: 100vh;
+    width: 100vw;
+    display: grid;
+    place-items: center;
+}
+
+.parent {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.parent {
+    width: 90%;
+    height: 90%;
+}
+
+.box {
+    flex: 1 1 200px; /*  Stretching: */
+    margin: 5px;
+}
+
+.box {
+    font-size: 2rem;
+    padding: 1rem;
+    display: grid;
+    place-items: center;
+    border-radius: 1rem;
+    border-style: dashed;
+}
+
+.green {
+    background-color: var(--green);
+    border: 1px solid var(--green--b);
+}
