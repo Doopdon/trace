@@ -10,19 +10,8 @@
     place-items: center;
 }
 
-.parent {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.parent {
-    width: 90%;
-    height: 90%;
-}
-
 .box {
-    flex: 1 1 200px; /*  Stretching: */
+    flex: 1 1 200px; 
     margin: 5px;
 }
 

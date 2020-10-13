@@ -1,7 +1,7 @@
 # trace
 I am calling this tool "trace". why? because you should always be able to trace back to the issue. you should never see an error that disappears into 5 pages of minified code. 
 
-It should do most of what react does when it is finished. and Idk what angular is doing except pissing me off but ima go out on a limb and say it can do angular stuff too.
+It should do most of what react does.
 
 to run the app cd into traceApp and run $ node index
 

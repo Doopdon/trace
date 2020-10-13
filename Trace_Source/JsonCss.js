@@ -7,6 +7,7 @@ class CssBlock{
         return style(this.toString());
     }
     toString(){
+        if(!this.selector) return '';
         var css = `${this.selector}{\r\n`
         Object.keys(this.content).forEach(key=>{
             css += (`${key}:${this.content[key]};\r\n`)
@@ -16,7 +17,7 @@ class CssBlock{
     }
 }
 
-class CssFile{
+class CssSheet{
     constructor(blocks){
         this.blocks = blocks
     }

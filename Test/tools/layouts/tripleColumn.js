@@ -5,6 +5,18 @@ const tripleColumnComp = (left,center,right) =>
                 div({class:'box green'},center),
                 div({class:'box green'},right),
             ]),
-            new CssBlock('.parent',{'background-color':'transparent'}).toElementWrapper(),
-            new CssBlock('.tripleColumn-layout',{'background-color':'transparent',}).toElementWrapper(),
+            new CssSheet([
+                new CssBlock('.tripleColumn-layout',{
+                    
+                }),
+                new CssBlock('.parent',{
+                    'display': 'flex',
+                    'flex-wrap': 'wrap',
+                    'justify-content': 'center',
+                    'width': '90%',
+                    'height': '90%',
+                }),
+                new CssBlock('',{}),
+            ]).toElementWrapper()
+
         ])
