@@ -1,0 +1,1 @@
+const infoPageComp = div([h3('info')])
