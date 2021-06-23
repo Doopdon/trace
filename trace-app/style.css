@@ -1,0 +1,167 @@
+*{
+    margin: 0px;
+    box-sizing: border-box;
+    letter-spacing: 2px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+:root{
+    --base:rgb(180, 180, 180);
+    --ground:rgb(46, 46, 46);
+    --ground-alt:rgb(46, 46, 46);
+    --accent:rgb(42, 173, 235);
+}
+body{
+    margin: 0px;
+    background:var(--ground);
+    color:var(--base);
+    /* overflow: hidden; */
+}
+
+.header-wrapper{
+    /* background-image: linear-gradient(rgb(51, 80, 143),rgb(87, 133, 233)); */
+    border-bottom: 2px solid var(--base);
+    width: 90vw;
+    height: max(10vh,30px);
+    display: flex;
+    flex-direction: row;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.right{
+    margin-left: auto;
+}
+
+.menu-item{ 
+    height: 100%;
+    display: grid;
+    place-items: center;
+}
+
+.burger-menu{
+    display: flex;
+    flex-direction: column;
+}
+
+.burger-menu .bar{
+    background: var(--accent);
+    margin:3px;
+    width:30px;
+    height: 5px;
+    border-radius: 2.5px;
+}
+
+.title{
+    color:var(--accent);
+    font-size: 1.7rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.background{
+    width:100vw;
+}
+
+.tron-button{
+    font-size: 1.5rem;
+    display:inline-block;
+    color: var(--accent);
+    border: 2px solid var(--base);
+    padding: 5px 10px;
+    margin:5px;
+    border-radius: 100px;
+    cursor: pointer;
+    /* box-shadow: 0px 0px 5px 1px var(--base); */
+}
+
+.tron-button:active{
+    margin-top: 7px;
+    margin-bottom: 3px;
+}
+
+.app-body{
+    width: 90vw;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.info-box{
+    box-shadow: 0px 0px 5px 1px var(--base);
+    padding: 10px;
+    width: 70%;
+    border-radius: 3px;
+    background: var(--ground-alt);
+}
+
+.info-box p{
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.info-box h1{
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.footer{
+    margin: 10px;
+    text-align: center;
+}
+
+.spacer{
+    height: 100px;
+}
+
+.render-prop-demo textarea{
+    resize: none;
+    box-shadow: none;
+    background:var(--ground);
+    color:var(--base)
+}
+
+.render-prop-item{
+    color:rgb(204 160 33);
+    display: inline;
+    margin:5px;
+}
+
+select{
+    background: var(--ground);
+    color: var(--base);
+    border-radius: 15px;
+    padding: 5px;
+}
+
+.inline{
+    display: inline;
+}
+
+.block{
+    display: block;
+}
+
+.inline-block{
+    display: inline-block;
+}
+
+.edit-item{
+    width:45%;
+}
+
+.edit-item .tron-button{
+    display: inline;
+}
+
+.stress-test{
+    display: flex;
+    flex-wrap: wrap;
+}
+.stress-test>div{
+    background-color: black;
+    width: 1px;
+    height: 1px;
+}
+
+
+

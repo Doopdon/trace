@@ -1,0 +1,11 @@
+/* The animation code */
+@keyframes append{
+    from{opacity: 0;}
+    to{opacity: 1;}
+}
+
+/* The element to apply the animation to */
+.list-item {
+    animation-name: append;
+    animation-duration: 1s;
+}
