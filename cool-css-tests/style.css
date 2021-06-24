@@ -1,0 +1,65 @@
+*{
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body{
+    overflow: hidden;
+    
+}
+
+#main-div{
+    background-image: linear-gradient(to bottom right,grey,rgb(37, 37, 37));
+    /* outline: 1px solid red; */
+    position: relative;
+    padding-top: 15px;
+    width: 100vw;
+    height: 100vh;
+}
+
+#top-bar{
+    width:80%;
+    margin: auto;
+    height: min(40px, 7vh);
+    
+}
+
+#side-bar{
+    width: 30%;
+    height: 80vh;
+    display: inline-block;
+    margin-top: 10px;
+    margin-left: 10px;   
+}
+
+#main-content{
+    display: inline-block;
+    margin-top: 10px;
+    margin-left: 30px;
+    width: 60%;
+    height: 80vh;
+}
+
+.vaporwave-box{
+    border-radius: 5px;
+    background-image: linear-gradient(to bottom right, rgb(0, 162, 255), rgb(212, 0, 255));
+    box-shadow: black 5px 5px 5px;
+}
+
+.info-box{
+    width: 50%;
+    height: 50%;
+} 
+
+.yellow-scheme{
+    background-image: linear-gradient(to bottom right, rgb(214, 233, 49), rgb(121, 119, 26));
+    border:7px solid rgb(110, 110, 2);
+    box-shadow: black 5px 5px 5px;
+}
+
+.blue-tron{
+    /* border-top: 3px solid blue; */
+    
+    /* background: radial-gradient(at bottom right,rgb(0, 0, 0,0),rgb(0, 0, 0,0),rgb(0, 0, 255,.5)); */
+    background-image: linear-gradient(to bottom right, rgb(49, 61, 233), rgb(255, 255, 255,0));
+}
