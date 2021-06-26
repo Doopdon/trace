@@ -41,7 +41,7 @@ function headerComponent(){
 
 function footerComp(){
     return div({class:'footer'},[
-        'Copy right: nothing'
+        "Copy right: nothing. Take It! It's free!"
     ])
 }
 

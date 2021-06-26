@@ -13,7 +13,7 @@ function pageRouter(){
 
     function change(funct){
         if(isNavigating) return (isNavigating = false)//if isNavigating is true do not push, then set isNavigating to false; 
-        console.log('pushing')
+        window.scrollTo(0,0);
         let newUrl = [baseUrl, funct.name].join('?');
         window.history.pushState(funct.name,funct.name+' function',newUrl)
     }

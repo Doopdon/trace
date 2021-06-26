@@ -12,10 +12,10 @@ function installingTrace(){
             buttonComp('Copy',copyTextToClipBoard)
         ]),
         div([
-            p('Put the code in a script tag somewhwere in your html')
+            p('Put the code in a script tag somewhwere in your html.')
         ]),
         div([
-            p('call the function "traceInit(window)" after that script')
+            p('call the function "traceInit(window)" after that script.')
         ]),
         div([
             p('find the id of an elemnt you want to use h1("Hello world"").render(<element id>)')

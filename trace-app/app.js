@@ -14,7 +14,10 @@ div({},[
 
 
 function displayBox(attributes,body){
-    attributes = attributes || {};
+    if(!body) {
+        body = attributes;
+        attributes = {};
+    }
     attributes.class = attributes.class && attributes.class + ' info-box' || 'info-box';
     return div(attributes,[body]);
 }
