@@ -1,12 +1,12 @@
 traceInit(window)
 
-let __pageController = new RenderProp(whatTraceCanDo)
+let __router = new pageRouter()
 
 div({},[
      div({class:'background'},[
         headerComponent(),
         div({class:'app-body'},[
-            __pageController.display(x=>x()),
+            __router.pageController.display(x=>x()),
         ]),
         footerComp()
     ])

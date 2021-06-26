@@ -41,7 +41,7 @@ function headerComponent(){
 
 function footerComp(){
     return div({class:'footer'},[
-        'this is a footer'
+        'Copy right: nothing'
     ])
 }
 
@@ -54,7 +54,7 @@ function menuComp(){
 }
 
 function titleComp(){
-    return div({class:'title',onclick:()=>__pageController.val = homePageComp},[
+    return div({class:'title',onclick:()=>__router.pageController.val = homePageComp},[
         'Trac³'
     ])
 }
