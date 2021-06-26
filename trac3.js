@@ -329,7 +329,6 @@ function traceInit(__scope){
     //2232
     //76767
     
-    //todo have render take a query string so i dont have to do document.getelementbyid
     
     //todo do an extra parameter on hide, show and remove. it the hide function should take the value and the render function
     
@@ -338,6 +337,8 @@ function traceInit(__scope){
     //change "addChild" to "appendChild"
 
     //todo handle disabled as an Atr()
+
+    //todo see if i can get rid of idex to id tying, by just resetting the id every time the slit changes
 
     //REMOVED FEATURES
     //hiding showing filtering and "onchange" events, remap perfomance optimiser

@@ -16,7 +16,7 @@ function renderProps(){
         return displayBox({class:'render-prop-demo'},[
             h4('Here you can see a render prop in action'),
             p('change the text and see all the corresponding items change'),
-            p('Here is a renderprop:'),
+            p('Here is a render prop:'),
             rp.display(x=>h3({class:'render-prop-item'},x)),
             p('and another:'),
             rp.display(x=>h1({class:'render-prop-item'},x)),
@@ -54,9 +54,15 @@ function renderProps(){
         let renderPropDisplayElem = x=> p({class:'render-prop-item'},x)
 
         return displayBox({class:'render-prop-demo block'},[
+            p('Here is an example of the recursive nature of render props.'),
+            p('In this example there is a render prop that takes an object in ths case a user object with a name, email and address propery.'),
+            p('You can change render prop with this drop down'),
            select({onchange:x=>changeUser(x)},[
                users.map((x,i)=>option('User: '+(i+1)))
            ]),
+           p('This swaps the render prop with another user object.'),
+           p('But the name, email and address are themselves render props of the user object'),
+           p('Because of this only the email elements change when the email is changed which saves on dom manipulation'),
            currentUser.display(x=>{
                return div([
                     x.name.display(renderPropDisplayElem),
@@ -64,6 +70,7 @@ function renderProps(){
                     x.address.display(renderPropDisplayElem),
                ])
            }),
+           p('Here you can edit the individual sub-render props and see them affect the elements above.'),
            currentUser.display(x=>div([
                editField(x.name),
                editField(x.email),
@@ -85,7 +92,13 @@ function renderProps(){
 
         
         return displayBox({},[
-            names.display(x=>p({class:'render-prop-item'},x)),
+            p('The most powerful render prop is the render list, which handles a list of render props.'),
+            p('You could simply create an array of render props, but deleting, inserting and reordering will be difficult.'),
+            p('A render List handles all the deleting, inserting and reordering while changing as few elements as possible.'),
+            p('When you create a render and call "display" you will get a render prop with added functionality to help you interface with the render list the render prop is apart of'),
+            p('Here you can see how a render list can add, edit, remove and reorder a set of list items.'),
+            names.display(x=>p({class:'render-prop-item'},x+',')),
+            p('You can see how the list above changes with the editable list below.'),
             names.display((x,r)=>{return div({class:'list-item'},[
                 div({class:'edit-item inline-block'},editField(r,{class:'inline'})),
                 buttonComp('🗑',()=>r.delete()),
@@ -93,6 +106,13 @@ function renderProps(){
                 buttonComp('⬇',()=>r.moveTo(r.index+1)),
             ])}),
             buttonComp('Add',()=>names.push('new user')),
+            p('Some additional info:'),
+            ul([
+                li(p('Each list item has an Id that is simply an int that gets incremented with each new item (it never resets or decrements)')),
+                li(p('Whenever a reorder, delete or insert occurs the render list iterates through each index and ties the items id to the index so index can be found quickly')),
+                li(p('When an item is moved, it is deleted and reinserted but the id is kept')),
+            ])
+
         ])
     }
 }
