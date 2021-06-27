@@ -216,8 +216,9 @@ function traceInit(__scope){
             }
             set val(newArray){
                 this.baseChange()//insure that any AttributeInserts get updated.
-                this.renderProps.forEach(()=>this.deleteAt(0,false))//delete each item. (do not map the indexes until the end to improve performance)
+                while(this.renderProps.length) this.deleteAt(0,false)//delete each item. (do not map the indexes until the end to improve performance)
                 newArray.forEach(x=>this.insertAt(0,x,null,false))//add each one into the array (do not override id and do not re-map each time for performance)
+                this.length.val = this.renderProps.length//update the length once so it doesn't render each time.
                 this.__mapIndexes();//after all items are added, then remap the indexes.
             }
             display(renderFunction){
@@ -238,7 +239,7 @@ function traceInit(__scope){
                 this.__listWrappers.forEach(x=>x.insertAt(index,rProp))//go through each list wrapper and insert it at the index
                 this.renderProps.splice(index,0,rProp);//insert the prop into the list of props
                 __mapIndexes && this.__mapIndexes();//if this is a mass delete or add, do not map the indexes till the end.
-                this.length.val = this.renderProps.length;//update the length.
+                __mapIndexes && (this.length.val = this.renderProps.length);//update the length.
             }
             pop(){
                 return this.deleteAt(this.renderProps.length-1)
@@ -250,7 +251,7 @@ function traceInit(__scope){
                 this.__listWrappers.forEach(x=>x.deleteAt(index))
                 let val = this.renderProps[index].val;
                 this.renderProps.splice(index,1);
-                this.length.val = this.renderProps.length;
+                __mapIndexes && (this.length.val = this.renderProps.length);
                 __mapIndexes && this.__mapIndexes();
                 return val;
             }

@@ -6,6 +6,7 @@ function installingTrace(){
     let source = "not working right now"
 
     return div([
+        spacer(),
         addingTraceToExistingApp(),
         spacer(),
         creatingANewTraceApp(),

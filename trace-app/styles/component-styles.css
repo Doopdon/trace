@@ -48,3 +48,13 @@
     font-size: xx-small;
     overflow: hidden;
 }
+
+.monitor{
+
+}
+
+.monitor .line{
+    height: 1px;
+    margin-top: 1px;
+    background: greenyellow;
+}
