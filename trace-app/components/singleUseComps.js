@@ -12,7 +12,7 @@ function headerComponent(){
 
 function footerComp(){
     return div({class:'footer'},[
-        "Copy right: nothing. Take It! It's free!"
+        "Copyright: nothing. Take It! It's free!"
     ])
 }
 
@@ -42,15 +42,35 @@ function menuComp(){
     }
 
     function menu(){
-        var items = [homePageComp,installingTrace,learnTrace,renderProps,whatIsTrace,whatTraceCanDo]
+        var items = [{
+            name:'Home',
+            funct:homePageComp
+        },
+        {
+            name:'Installing',
+            funct:installingTrace
+        },
+        {
+            name:'Learning',
+            funct:learnTrace
+        },
+        {
+            name:'RenderProps',
+            funct:renderProps
+        },
+        {
+            name:'What is it',
+            funct:whatIsTrace
+        },
+        {
+            name:'What Can it Do',
+            funct:whatTraceCanDo
+        }]
 
         return div({class:'main-menu-wrapper'},[
             div({class:'main-menu-content'},[
                 displayBox({class:'main-menu-box'},[
-                    buttonComp('Hey'),
-                    buttonComp('Hey'),
-                    buttonComp('Hey'),
-                    buttonComp('Hey'),
+                    items.map(x=>buttonComp(x.name,()=>__router.pageController.val = x.funct))
                 ])
             ])
         ])

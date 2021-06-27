@@ -1,0 +1,41 @@
+.tron-button{
+    font-size: 1.5rem;
+    display:inline-block;
+    color: var(--accent);
+    border: 2px solid var(--base);
+    padding: 5px 10px;
+    margin:5px;
+    border-radius: 100px;
+    cursor: pointer;
+}
+
+.tron-button:active{
+    margin-top: 7px;
+    margin-bottom: 3px;
+}
+
+.tron-button:hover{
+    text-shadow: 0 0 2px var(--accent);
+    border: 3px solid var(--base);
+    padding: 4px 9px;
+}
+
+
+.info-box{
+    box-shadow: 0px 0px 5px 1px var(--base);
+    padding: 10px;
+    width: 100%;
+    max-width: 800px;
+    border-radius: 3px;
+    background: var(--ground-alt);
+}
+
+.info-box p{
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.info-box h1{
+    padding-top: 5px;
+    padding-bottom: 5px;
+}

@@ -41,8 +41,10 @@
     position: absolute;
     right: 0;
     top:10px;
+    text-align: center;
 }
 
-.main-menu-box{
-    
+.main-menu-content .tron-button{
+    width: max-content;
+    margin-left: auto;
 }

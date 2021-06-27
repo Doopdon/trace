@@ -5,10 +5,10 @@ function whatTraceCanDo(){
 
     return div([
         elementNum.display(x=>{
-            return textarea({onchange:e=>{elementNum.val=e.target.value}},x)
+            return input({onchange:e=>{elementNum.val=e.target.value}, value:x},[])
         }),
         elementNum.display(x=>div([`make ${x} elements`])),
-        buttonComp('go',x=>{
+        buttonComp('Go',x=>{
             oneK.append(stress(elementNum.val))
         }),
         (oneK = div()),
