@@ -34,3 +34,9 @@ function genLoop(x,funct){
     for(let i = 0; i < x; i++) arr.push(funct(i))
     return arr;
 }
+
+function randomBetween(a,b){
+    var dif = Math.abs(b-a);
+    var min = Math.min(a,b);
+    return Math.round(Math.random()*dif)+min;
+}

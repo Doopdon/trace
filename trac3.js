@@ -332,6 +332,8 @@ function traceInit(__scope){
 
     //2232
     //76767
+
+    //todo looks like there is an issue with swapping double arrays out. It seems to break sub "display" functions but only for large numbers
     
     //todo two way binding would be nice
 

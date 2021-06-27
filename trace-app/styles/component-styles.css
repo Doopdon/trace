@@ -43,3 +43,8 @@
 .title:hover{
     text-shadow: 0 0 2px var(--accent);
 }
+
+.the-grid{
+    font-size: xx-small;
+    overflow: hidden;
+}
