@@ -23,3 +23,5 @@ function pageRouter(){
             me.pageController.val = window[e.state]
     }    
 }
+
+function keyVal(x){ return Object.keys(x).map(k=>{return {key:k,val:x[k]}})}

@@ -42,35 +42,21 @@ function menuComp(){
     }
 
     function menu(){
-        var items = [{
-            name:'Home',
-            funct:homePageComp
-        },
-        {
-            name:'Installing',
-            funct:installingTrace
-        },
-        {
-            name:'Learning',
-            funct:learnTrace
-        },
-        {
-            name:'RenderProps',
-            funct:renderProps
-        },
-        {
-            name:'What is it',
-            funct:whatIsTrace
-        },
-        {
-            name:'What Can it Do',
-            funct:whatTraceCanDo
-        }]
+        var items = {
+            'Home':homePageComp,
+            'Installing':installingTrace,
+            'Learning':learnTrace,
+            'RenderProps':renderProps,
+            'What is it':whatIsTrace,
+            'What Can it Do':whatTraceCanDo,
+        }
 
         return div({class:'main-menu-wrapper'},[
             div({class:'main-menu-content'},[
                 displayBox({class:'main-menu-box'},[
-                    items.map(x=>buttonComp(x.name,()=>__router.pageController.val = x.funct))
+                    keyVal(items).filter(x=>__router.pageController.val.name != x.val.name)
+                    .map(x=>buttonComp(x.key,()=>__router.pageController.val = x.val))
+                    //Object.keys(x=>buttonComp(x.name,()=>__router.pageController.val = x.funct))
                 ])
             ])
         ])
