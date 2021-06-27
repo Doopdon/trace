@@ -3,4 +3,4 @@ I am calling this tool "trace". why? because you should always be able to trace 
 
 It should do most of what react does.
 
-to run the app: open the trace.html file in the demo folder in chrome to run a bunch of demos unconnected to a server.
+to run the app: open the trace.html file in the trace-app folder in a browser.

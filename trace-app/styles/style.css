@@ -17,6 +17,8 @@ body{
     color:var(--base);
 }
 
+
+
 .header-wrapper{
     /* background-image: linear-gradient(rgb(51, 80, 143),rgb(87, 133, 233)); */
     border-bottom: 2px solid var(--base);

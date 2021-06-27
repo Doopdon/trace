@@ -19,13 +19,13 @@ function footerComp(){
 function menuComp(){
     let open = new RenderProp(false);
 
-    return div({onclick:()=>open.val = !open.val},[
+    return div({class:'menu-root',onclick:()=>open.val = !open.val},[
         open.display(x=>x?openState():closedState())
     ])
 
     function openState(){
         return div([
-            div({class:'x-menu', },[
+            div({class:'x-menu menu-btn', },[
                 div({class:'x-part x-1 bar'},[]),
                 div({class:'x-part x-2 bar'},[]),
             ]),
@@ -34,7 +34,7 @@ function menuComp(){
     }
 
     function closedState(){
-        return div({class:'burger-menu', },[
+        return div({class:'burger-menu menu-btn', },[
             div({class:'bar'},[]),
             div({class:'bar'},[]),
             div({class:'bar'},[]),
@@ -56,7 +56,6 @@ function menuComp(){
                 displayBox({class:'main-menu-box'},[
                     keyVal(items).filter(x=>__router.pageController.val.name != x.val.name)
                     .map(x=>buttonComp(x.key,()=>__router.pageController.val = x.val))
-                    //Object.keys(x=>buttonComp(x.name,()=>__router.pageController.val = x.funct))
                 ])
             ])
         ])
