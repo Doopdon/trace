@@ -27,52 +27,12 @@ body{
     flex-direction: row;
     margin-left: auto;
     margin-right: auto;
+    padding-top: 10px;
 }
 
 .right{
     margin-left: auto;
 }
-
-.menu-item{ 
-    height: 100%;
-    display: grid;
-    place-items: center;
-}
-
-.burger-menu{
-    display: flex;
-    flex-direction: column;
-}
-
-.bar{
-    background: var(--accent);
-    margin:3px;
-    width:30px;
-    height: 5px;
-    border-radius: 2.5px;
-}
-
-.x-menu{
-    position: relative;
-    width:33px;
-    height: 33px;
-    /* display: flex;
-    flex-direction: column; */
-}
-
-.x-menu .x-part{
-    position: absolute;
-    top:13px;
-}
-
-.x-menu .x-2{
-    transform: rotate(45deg);
-   
-}
-
-.x-menu .x-1{
-    transform: rotate(-45deg);
-} 
 
 .title{
     color:var(--accent);

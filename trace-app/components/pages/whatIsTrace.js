@@ -23,9 +23,5 @@ function whatIsTrace(){
             p('this is a paragraph'),
             button({onclick:()=>alert('hey')},'Click')
         ])])
-
-
     ])
 }
-
-//&lt; < &gt; > &nbsp; " "

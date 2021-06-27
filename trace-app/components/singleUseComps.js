@@ -42,8 +42,17 @@ function menuComp(){
     }
 
     function menu(){
-        return div({class:'main-menu'},[
-            'taeateswtests'
+        var items = [homePageComp,installingTrace,learnTrace,renderProps,whatIsTrace,whatTraceCanDo]
+
+        return div({class:'main-menu-wrapper'},[
+            div({class:'main-menu-content'},[
+                displayBox({class:'main-menu-box'},[
+                    buttonComp('Hey'),
+                    buttonComp('Hey'),
+                    buttonComp('Hey'),
+                    buttonComp('Hey'),
+                ])
+            ])
         ])
     }
 }
