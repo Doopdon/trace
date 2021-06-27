@@ -9,7 +9,6 @@ function pageRouter(){
     if(pageName && window[pageName]) 
         me.pageController.val = window[pageName];
     window.onpopstate = backForward;
-    
 
     function change(funct){
         if(isNavigating) return (isNavigating = false)//if isNavigating is true do not push, then set isNavigating to false; 

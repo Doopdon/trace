@@ -13,18 +13,7 @@ div({},[
 ]).render('root')
 
 
-function displayBox(attributes,body){
-    if(!body) {
-        body = attributes;
-        attributes = {};
-    }
-    attributes.class = attributes.class && attributes.class + ' info-box' || 'info-box';
-    return div(attributes,[body]);
-}
 
-function spacer(){
-    return div({class:'spacer'},[])
-}
 
 
 //I dont like using get

@@ -27,34 +27,19 @@ function editField(renderProp,attributes){
     })
 }
 
-function headerComponent(){
-    return div({class:'header-wrapper'},[
-        link({rel:'icon',type:'image/png',href:'content/favicon.ico'},[]),
-        div({class:'menu-item left'},[
-            titleComp()
-        ]),
-        div({class:'menu-item right'},[
-            menuComp()
-        ]),
-    ])
+
+
+
+
+function displayBox(attributes,body){
+    if(!body) {
+        body = attributes;
+        attributes = {};
+    }
+    attributes.class = attributes.class && attributes.class + ' info-box' || 'info-box';
+    return div(attributes,[body]);
 }
 
-function footerComp(){
-    return div({class:'footer'},[
-        "Copy right: nothing. Take It! It's free!"
-    ])
-}
-
-function menuComp(){
-    return div({class:'burger-menu'},[
-        div({class:'bar'},[]),
-        div({class:'bar'},[]),
-        div({class:'bar'},[]),
-    ])
-}
-
-function titleComp(){
-    return div({class:'title',onclick:()=>__router.pageController.val = homePageComp},[
-        'Trac³'
-    ])
+function spacer(){
+    return div({class:'spacer'},[])
 }

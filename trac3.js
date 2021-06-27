@@ -148,14 +148,14 @@ function traceInit(__scope){
             }
             baseChange(){//gets called on value change to insure attribute inserts get changed TODO see if I need to do this. I think i do.
                 this.attributeInserts.forEach(x=>x.update());//TODO check for mem leaks.
-                this.onChange(this.val,this);
+                this.__onChange && this.__onChange(this.val,this);
             }
             update(funct){
                 funct = funct || function(x){return x};
                 this.val = funct(this.val);
             }
             onChange(callback){
-                this.onChange = callback;
+                this.__onChange = callback;
             }
         }
     
