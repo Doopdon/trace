@@ -1,6 +1,7 @@
 //handles urls so the page can be navigated like a traditional website
 function pageRouter(){
-    var me =  this;
+    let me =  this;
+    let lastFunct;
     me.pageController = new RenderProp(homePageComp)
     me.pageController.onChange(change)
     let isNavigating = false;//handles back and forward button events.
@@ -11,11 +12,12 @@ function pageRouter(){
     window.onpopstate = backForward;
 
     function change(funct){
-        if(funct.name == me.pageController.val.name) return;
+        if(lastFunct == funct) return;//if the new funct is the same as the last, do nothing
         if(isNavigating) return (isNavigating = false)//if isNavigating is true do not push, then set isNavigating to false; 
         window.scrollTo(0,0);
         let newUrl = [baseUrl, funct.name].join('?');
         window.history.pushState(funct.name,funct.name+' function',newUrl)
+        lastFunct = funct;
     }
 
     function backForward(e){
@@ -26,3 +28,9 @@ function pageRouter(){
 }
 
 function keyVal(x){ return Object.keys(x).map(k=>{return {key:k,val:x[k]}})}
+
+function genLoop(x,funct){ 
+    let arr = []
+    for(let i = 0; i < x; i++) arr.push(funct(i))
+    return arr;
+}

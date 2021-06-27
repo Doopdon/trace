@@ -333,7 +333,10 @@ function traceInit(__scope){
     //2232
     //76767
     
-    
+    //todo two way binding would be nice
+
+    //todo better error //elementNum.display(x=>x) dispaly function does not return an element wrapper 
+
     //todo do an extra parameter on hide, show and remove. it the hide function should take the value and the render function
     
     //todo make the divs not there, not just invisible. when hidden.
