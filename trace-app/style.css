@@ -44,13 +44,35 @@ body{
     flex-direction: column;
 }
 
-.burger-menu .bar{
+.bar{
     background: var(--accent);
     margin:3px;
     width:30px;
     height: 5px;
     border-radius: 2.5px;
 }
+
+.x-menu{
+    position: relative;
+    width:33px;
+    height: 33px;
+    /* display: flex;
+    flex-direction: column; */
+}
+
+.x-menu .x-part{
+    position: absolute;
+    top:13px;
+}
+
+.x-menu .x-2{
+    transform: rotate(45deg);
+   
+}
+
+.x-menu .x-1{
+    transform: rotate(-45deg);
+} 
 
 .title{
     color:var(--accent);
@@ -89,7 +111,8 @@ body{
 .info-box{
     box-shadow: 0px 0px 5px 1px var(--base);
     padding: 10px;
-    width: 70%;
+    width: 100%;
+    max-width: 800px;
     border-radius: 3px;
     background: var(--ground-alt);
 }

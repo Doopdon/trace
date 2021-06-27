@@ -17,11 +17,35 @@ function footerComp(){
 }
 
 function menuComp(){
-    return div({class:'burger-menu'},[
-        div({class:'bar'},[]),
-        div({class:'bar'},[]),
-        div({class:'bar'},[]),
+    let open = new RenderProp(false);
+
+    return div({onclick:()=>open.val = !open.val},[
+        open.display(x=>x?openState():closedState())
     ])
+
+    function openState(){
+        return div([
+            div({class:'x-menu', },[
+                div({class:'x-part x-1 bar'},[]),
+                div({class:'x-part x-2 bar'},[]),
+            ]),
+            menu()
+        ])
+    }
+
+    function closedState(){
+        return div({class:'burger-menu', },[
+            div({class:'bar'},[]),
+            div({class:'bar'},[]),
+            div({class:'bar'},[]),
+        ]);
+    }
+
+    function menu(){
+        return div({class:'main-menu'},[
+            'taeateswtests'
+        ])
+    }
 }
 
 function titleComp(){
