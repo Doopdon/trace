@@ -17,7 +17,7 @@ function editField(renderProp,attributes){
         else{
             let area;
             return div(attributes,[
-                renderProp.display(x=>area = textarea(x)),
+                renderProp.display(x=>area = input({value:x},[])),
                 buttonComp('Save',()=>{
                     renderProp.val = area.$element.value;
                     editMode.val = false;

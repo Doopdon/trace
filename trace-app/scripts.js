@@ -11,6 +11,7 @@ function pageRouter(){
     window.onpopstate = backForward;
 
     function change(funct){
+        if(funct.name == me.pageController.val.name) return;
         if(isNavigating) return (isNavigating = false)//if isNavigating is true do not push, then set isNavigating to false; 
         window.scrollTo(0,0);
         let newUrl = [baseUrl, funct.name].join('?');
