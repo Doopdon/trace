@@ -1,37 +1,35 @@
 function whatTraceCanDo(){
 
-    let g = {};
-    let elementNum = new RenderProp(1000);
-    let elementInput = new RenderProp(1000);
-
     return div([
-        makeManyElements(),
         spacer(),
-        giganticMovingTable(),
+        hidShow('Make a bunch of elements',makeManyElements),
+        hidShow('Giant Moving table',giganticMovingTable),
     ])
 
-    function giganticMovingTable(){
+    function giganticMovingTable(hideFunct){
         let {array,monitorProp} = makeArray();
-        let cont;
+        let cont = new RenderProp(false)
 
         return displayBox([
             h2('Here are 10k numbers changing'),
-            p('When you click "Go" every 1000th of a second 100 random decimals are changed to another random decimal (0-9). You can see the total of each row'),
-            buttonComp('reset',resetArray),
-            buttonComp('Go',goCray),
+            p('When you click "Go" every 1000th of a second 100 random decimals are changed to another random decimal (0-9). You can see the total of each row. (Yes it is useless)'),
+            cont.display(x=>x ? 
+                buttonComp('Reset',resetArray):
+                buttonComp('Go',goCray)),
             p('Total of each rows as bar graph:'),
             monitor(),
             p('Output:'),
             changingGrid(),
+            buttonComp('Hide',()=>{cont.val=false,hideFunct()},'accent-alt-color'),
         ]);
 
         function goCray(){
-            cont = true;
+            cont.val = true;
             loop();
 
             function loop(){
                 setTimeout(() => {
-                    if(!cont) return;
+                    if(!cont.val) return;
                     updateNums();
                     sumAll();
                     loop()
@@ -53,13 +51,11 @@ function whatTraceCanDo(){
                     newArray.push(rp.val.val.reduce((a, b) => a + b))
                 })
                 monitorProp.val =  newArray;
-                console.log(monitorProp.val.length)
             }
         }
 
         function monitor(){
             return displayBox({class:'monitor'},[
-                p('0-900'),
                 monitorProp.display(x=>div({class:'line',style:`width:${x}px;`},[]))
             ]);
         }
@@ -71,7 +67,7 @@ function whatTraceCanDo(){
         }
 
         function resetArray(){
-            cont = false;
+            cont.val = false;
             array.renderProps.forEach(rp => {
                 rp.val.renderProps.forEach(rp2=>{
                     rp2.val = 0;
@@ -91,18 +87,20 @@ function whatTraceCanDo(){
     }
 
 
-    function makeManyElements(){
+    function makeManyElements(hideFunct){
+
+        let elementNum = new RenderProp(0);
+        let elementInput = new RenderProp(50000);
         return displayBox([
             h2('Stress Test'),
             p('Here you can make N number of 1x1 px divs by entering N into the text box and clicking "Go". (be warned 1000000+ tends to freeze the browser up)'),
-            input({onkeyup:e=>{elementInput.val=e.target.value}, value:elementNum.val},[]),
-            elementInput.display(x=>div([`make ${x} elements`])),
+            input({onkeyup:e=>{elementInput.val=e.target.value}, value:elementInput.val},[]),
+            elementInput.display(x=>div([`make ${numberWithCommas(x)} elements`])),
             buttonComp('Go',()=>{
-                elementNum.val =  elementInput.val;
-                //g.oneK.append(stress(elementNum.val))
+                elementNum.val = elementInput.val;
             }),
-            elementNum.display(x=>div({class:'stress-test'},genLoop(x,()=>div())))
-                //elementNum.display(x=>div(x))
+            elementNum.display(x=>div({class:'stress-test'},genLoop(x,()=>div()))),
+            buttonComp('Hide',hideFunct,'accent-alt-color')
         ])
     }
 }

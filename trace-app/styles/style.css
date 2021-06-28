@@ -10,6 +10,7 @@
     --ground:rgb(46, 46, 46);
     --ground-alt:rgb(46, 46, 46);
     --accent:rgb(42, 173, 235);
+    --accent-alt:rgb(204, 160, 33);
 }
 body{
     margin: 0px;
@@ -78,7 +79,7 @@ input{
 }
 
 .render-prop-item{
-    color:rgb(204 160 33);
+    color:var(--accent-alt);
     display: inline;
     margin:5px;
 }
@@ -115,9 +116,32 @@ select{
     flex-wrap: wrap;
 }
 .stress-test>div{
-    background-color: black;
+    background-color: greenyellow;
+    margin-left: 1px;
+    margin-top: 1px;
     width: 1px;
     height: 1px;
+}
+
+
+.base-color{
+    color:var(--base);
+}
+
+.ground-color{
+    color:var(--ground);
+}
+
+.ground-alt-color{
+    color:var(--ground-alt);
+}
+
+.accent-color{
+    color:var(--accent);
+}
+
+.accent-alt-color{
+    color:var(--accent-alt);
 }
 
 

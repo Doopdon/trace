@@ -1,7 +1,5 @@
-function buttonComp(text,clickEvent){
-    return div({onclick:clickEvent, class:'tron-button'},[
-        text
-    ])
+function buttonComp(text,clickEvent,colorClass){
+    return div({onclick:clickEvent, class:'tron-button '+colorClass},text)
 }
 
 function editField(renderProp,attributes){
@@ -27,10 +25,6 @@ function editField(renderProp,attributes){
     })
 }
 
-
-
-
-
 function displayBox(attributes,body){
     if(!body) {
         body = attributes;
@@ -42,4 +36,19 @@ function displayBox(attributes,body){
 
 function spacer(){
     return div({class:'spacer'},[])
+}
+
+function smallSpacer(){
+    return div({class:'spacer-small'},[])
+}
+
+function hidShow(title,renderFunct){
+    var show = new RenderProp(false)
+    return div([
+        show.display(x=> !x?
+            buttonComp(title,()=>show.val = true):
+            renderFunct(()=>show.val=false)
+        )
+    ])
+
 }

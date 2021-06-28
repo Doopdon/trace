@@ -40,3 +40,7 @@ function randomBetween(a,b){
     var min = Math.min(a,b);
     return Math.round(Math.random()*dif)+min;
 }
+
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
