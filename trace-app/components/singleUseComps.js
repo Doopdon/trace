@@ -54,8 +54,8 @@ function menuComp(){
         return div({class:'main-menu-wrapper'},[
             div({class:'main-menu-content'},[
                 displayBox({class:'main-menu-box'},[
-                    keyVal(items).filter(x=>__router.pageController.val.name != x.val.name)
-                    .map(x=>buttonComp(x.key,()=>__router.pageController.val = x.val))
+                    keyVal(items).filter(x=>__router.val.name != x.val.name)
+                    .map(x=>buttonComp(x.key,()=>__router.val = x.val))
                 ])
             ])
         ])
@@ -63,7 +63,7 @@ function menuComp(){
 }
 
 function titleComp(){
-    return div({class:'title',onclick:()=>__router.pageController.val = homePageComp},[
+    return div({class:'title',onclick:()=>__router.val = homePageComp},[
         'Trac³'
     ])
 }
