@@ -29,7 +29,7 @@ function installingTrace(){
                 li('Click the copy button'),
                 li('Put the code in a script tag somewhere in your html.'),
                 li('Call the function "traceInit(window)" after that script.'),
-                li('Find the ID of an element you want to insert trace into and write "h1("Hello world").render([element ID])" under traceInit.'),
+                li('Find the ID of an element you want to insert trace into and write "h1("Hello world").render("--element ID--")" under traceInit.'),
             ]),
             p('Thats It!!!')
     
