@@ -91,14 +91,20 @@ function whatTraceCanDo(){
 
         let elementNum = new RenderProp(0);
         let elementInput = new RenderProp(50000);
+        let time = new RenderProp(0)
+
         return displayBox([
             h2('Stress Test'),
             p('Here you can make N number of 1x1 px divs by entering N into the text box and clicking "Go". (be warned 1000000+ tends to freeze the browser up)'),
             input({onkeyup:e=>{elementInput.val=e.target.value}, value:elementInput.val},[]),
             elementInput.display(x=>div([`make ${numberWithCommas(x)} elements`])),
             buttonComp('Go',()=>{
+                let t1 = new Date().getTime();
                 elementNum.val = elementInput.val;
+                let t2 = new Date().getTime();
+                time.val = t2-t1;
             }),
+            time.display(x=>x && p(`It took ${x/100} seconds`)),
             elementNum.display(x=>div({class:'stress-test'},genLoop(x,()=>div()))),
             buttonComp('Hide',hideFunct,'accent-alt-color')
         ])

@@ -39,10 +39,8 @@ function traceInit(__scope){
                 if(typeof $parent === 'string') $parent = document.getElementById($parent);//use the string as an id to find the element as shorthand
                 this.$parent = $parent;
                 this.parentWrapper = parentWrapper;//set the parent and parent wrapper for this wrapper
-                //parentWrapper && 
-                // if(!parentWrapper?.childWrappers?.includes(this))//if the parent does not contain this wrapper
-                //     parentWrapper?.addChild(this); //add itself to the parents children
-                let $element = this.renderFunction($parent,this);//use the render function to generate an element and insert it into the parent.
+                
+                let $element = this.renderFunction($parent,this)//use the render function to generate an element and insert it into the parent.
                 if(!this.$element){////if a rendered element does not exist: 
                     parentWrapper?.addChild(this); //add itself to the parents children
                     let $afterElm = loc >= 0 && $parent.children[loc]; //determine if it is supposed to be inserted at a specific location
@@ -151,7 +149,7 @@ function traceInit(__scope){
                 this.__onChange && this.__onChange(this.val,this);
             }
             update(funct){
-                funct = funct || function(x){return x};
+                funct = funct || (x=>x);
                 this.val = funct(this.val);
             }
             onChange(callback){
@@ -173,13 +171,13 @@ function traceInit(__scope){
                 this.__value = value;//change the value/
                 this.baseChange()//apply any changes that the base class needs.
                 this.wrappers = this.wrappers.filter(x=>x.update())//re-run all the render functions for the wrappers
-                this.upda
             }
             display(renderFunction){//adds a new wrapper to be updated when the value is changed.
                 super.display(renderFunction);//check for errors.
-                let newWrapper = new ElementWrapper((p,ref)=>//create a new wrapper that will be updated wrappers take a "render function" that is normally a function of another element wrapper
-                    renderFunction(this.__value,this)//this time we call the render function, and pass in the value and the reference to the the whole renderProp (useful for list items)
-                    .render(p,ref));//when called render function we pass in returns an element wrapper. which has its own render function which we then call with the parent element wrapper 
+                let newWrapper = new ElementWrapper((p,ref)=>{//create a new wrapper that will be updated wrappers take a "render function" that is normally a function of another element wrapper
+                    var val = renderFunction(this.__value,this)//this time we call the render function, and pass in the value and the reference to the the whole renderProp (useful for list items)
+                    return  val.render && val.render(p,ref) || div({style:'display:none !important'},[]).render(p,ref);//add a blank div if no render function is available. TODO 38383
+                });//when called render function we pass in returns an element wrapper. which has its own render function which we then call with the parent element wrapper 
                 this.wrappers.push(newWrapper);//push the new wrapper so it can be accessed later and updated if needed.
                 return newWrapper;//return the element wrapper so the parent has a reference to it.
             }
@@ -347,6 +345,8 @@ function traceInit(__scope){
     //change "addChild" to "appendChild"
 
     //todo handle disabled as an Atr()
+
+    //TODO 38383 see if i can get no element at all
 
     //todo see if i can get rid of idex to id tying, by just resetting the id every time the slit changes
 
