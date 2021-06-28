@@ -49,6 +49,8 @@ function menuComp(){
             'RenderProps':renderProps,
             'What is it':whatIsTrace,
             'What Can it Do':whatTraceCanDo,
+            'Syntax':elementWrappers,
+            'Components':componentsDemoComp,
         }
 
         return div({class:'main-menu-wrapper'},[
