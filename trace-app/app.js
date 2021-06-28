@@ -1,12 +1,13 @@
 traceInit(window)
+routerInit(window)
 
-let __router = new pageRouter()
+let __router = new Trac3Router(homePageComp,window)
 
 div({},[
      div({class:'background'},[
         headerComponent(),
         div({class:'app-body'},[
-            __router.pageController.display(x=>x()),
+            __router.display(x=>x()),
         ]),
         footerComp()
     ])
