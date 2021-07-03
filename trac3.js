@@ -117,6 +117,8 @@ function traceInit(__scope){
             let val = this.renderFunction(this.rProp.val,this.rProp)
             if(this.atrName === 'innerHTML') 
                 return (this.$element.innerHTML = val)
+            if(typeof val === 'boolean')//TODO figure out why i dont need this for standard attributes
+                return (this.$element[this.atrName] = val)
             this.$element.setAttribute(this.atrName,val)
         }
         generateAttribute(atrName,$element){
@@ -271,8 +273,9 @@ function traceInit(__scope){
     }
 
     ///////////////////FUNCTION GENERATION///////////////////////
-    function generateElement(elementType,param1,param2,toMany){// the arguments can be given in multiple ways so they are written as param1 and 2
-        if(toMany) throw {message:`ERROR: ${elementType}(), contained too many parameters`,invalidObj:toMany};//there should only be 2 arguments supplied by the user. additional arguments will cause sever problems.
+    function generateElement(elementType,param1,param2,tooMany){// the arguments can be given in multiple ways so they are written as param1 and 2
+        if(tooMany instanceof Wrapper) throw {message:`ERROR: ${elementType}(), contained too many parameters, it appears you are not using an array in the parameter`,invalidObj:tooMany}
+        if(tooMany) throw {message:`ERROR: ${elementType}(), contained too many parameters`,invalidObj:tooMany};//there should only be 2 arguments supplied by the user. additional arguments will cause sever problems.
         var attributes = param2 != null ? param1 : null;//if there is a second parameter, the first one is attributes
         var content = param2 != null ? param2 : param1;//if there is no second parameter the first one is the content, otherwise its the second one.
         return new ElementWrapper(createElement)//create a new ElementWrapper with a renderFunction that creates a dom element outlined by the attributes and content parameters.
@@ -315,7 +318,7 @@ function traceInit(__scope){
     exp.RenderList = RenderList;
     const allElementNames = "a,abbr,acronym,address,applet,area,article,aside,audio,b,base,basefont,bb,bdo,big,blockquote,body,br,button,canvas,caption,center,cite,code,col,colgroup,command,datagrid,datalist,dd,del,details,dfn,dialog,dir,div,dl,dt,em,embed,eventsource,fieldset,figcaption,figure,font,footer,form,frame,frameset,h1,h2,h3,h4,h5,h6,head,header,hgroup,hr,html,i,iframe,img,input,ins,isindex,kbd,keygen,label,legend,li,link,map,mark,menu,meta,meter,nav,noframes,noscript,object,ol,optgroup,option,output,p,param,pre,progress,q,rp,rt,ruby,s,samp,script,section,select,small,source,span,strike,strong,style,sub,sup,table,tbody,td,textarea,tfoot,th,thead,time,title,tr,track,tt,u,ul,var,video,wbr"
     allElementNames.split(',').forEach(elementName=>exp[elementName] = //for every element type. add a function to exp of with that name as a type
-        (attr,content,toMany)=>generateElement(elementName,attr,content,toMany));//the function takes 2 arguments. 3 is "toMany" and will throw an error 
+        (attr,content,tooMany)=>generateElement(elementName,attr,content,tooMany));//the function takes 2 arguments. 3 is "tooMany" and will throw an error 
         //this function returns what is created by the "generateElement" function which needs the two arguments and a "type name" of the element to be created (given by the element type in the string)
     return exp;//the export will have the RenderList the RenderProp and a function for each type of element you can make.                                                        
 }
