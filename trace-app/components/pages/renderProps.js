@@ -7,6 +7,8 @@ function renderProps(){
         recursiveRenderPropDemo(),
         spacer(),
         renderPropListDemo(),
+        spacer(),
+        bindingDemoComp()
     ])
 
 
@@ -113,6 +115,15 @@ function renderProps(){
                 li(p('When an item is moved, it is deleted and reinserted but the id is kept')),
             ])
 
+        ])
+    }
+
+    function bindingDemoComp(){
+        let t = new RenderProp('change this text')
+        return div([
+            t.display(x=>p(x)),
+            t.boundDisplay(x=>input({onkeyup:(e)=>{t.boundUpdate(e)},value:x},'')),
+            t.boundDisplay(x=>input({onkeyup:(e)=>{t.boundUpdate(e)},value:x},''))
         ])
     }
 }
