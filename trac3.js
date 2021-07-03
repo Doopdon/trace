@@ -29,7 +29,10 @@ function traceInit(__scope){
             this.$element = null;//The created element is stored here 
             this.childWrappers = [];//Holds a list of all the chid element wrappers so traversal can happen.
         }    
-        update(){//when something is changed, the render function needs to be re run.
+        update($triggerElem){//when something is changed, the render function needs to be re run.
+            if($triggerElem && //if the trigger element is used as a param
+                this.$element == $triggerElem || //and this wrapper element is the trigger element
+                 this.$element.contains($triggerElem)) return true;//or this wrapper element contains the trigger element, then do not update, the elements changes are triggered by the user
             if(!document.contains(this.$parent)) return false;//if the parent is not on the document the wrapper needs to be removed from memory. (false indicates it is not on the dom)
             this.render(this.$parent,this.parentWrapper);//
             return true;
@@ -103,7 +106,7 @@ function traceInit(__scope){
             this.parentWrapper = parentWrapper;//set the parent wrapper for the ElementWrapperList
             parentWrapper && parentWrapper.addChild(this);//add self to child wrapper list (childWrappers) of parent
             this.__initialChildWrappers.forEach(x=>x.render($parent,this))//this will add all the wrappers to the child wrapper list (childWrappers). all subsequent additions will not use the __initialChildWrappers but the childWrappers
-        }
+        }//todo add update to list(i think)
     }
     ///////////////////////////////AttributeInserts//////////////////
     //Attribute Insert class handles changes to attributes of individual elements without re rendering the element (which could be expensive if there are many child elements)
@@ -169,9 +172,12 @@ function traceInit(__scope){
             return this.__value;
         }
         set val(value){
+            this.__setValue(value)
+        }
+        __setValue(value,element){
             this.__value = value;//change the value/
             this.baseChange()//apply any changes that the base class needs.
-            this.wrappers = this.wrappers.filter(x=>x.update())//re-run all the render functions for the wrappers
+            this.wrappers = this.wrappers.filter(x=>x.update(element))//re-run all the render functions for the wrappers
         }
         display(renderFunction){//adds a new wrapper to be updated when the value is changed.
             super.display(renderFunction);//check for errors.
@@ -181,6 +187,12 @@ function traceInit(__scope){
             });//when called render function we pass in returns an element wrapper. which has its own render function which we then call with the parent element wrapper 
             this.wrappers.push(newWrapper);//push the new wrapper so it can be accessed later and updated if needed.
             return newWrapper;//return the element wrapper so the parent has a reference to it.
+        }
+        bind(event_element,value){
+            let $element = event_element?.target || event_element; //get the event.target, or just the target (element)
+            if(!$element) throw "element or event not provided";
+            value = value || $element.value;//get the value from the element or from the parameter
+            this.__setValue(value,$element)//call the __setValue function but hand in the element so this element wont be updated.
         }
     }
     //This Class is a render prop that is inside a render list. it has a few extra features to easy use of renderLists
@@ -313,9 +325,11 @@ function traceInit(__scope){
         }
     }
 
-    let exp = __scope || {};
+    let exp = __scope || window;
     exp.RenderProp = RenderProp;
     exp.RenderList = RenderList;
+    exp.trace3globals = {};//to be use by other plugins to stay consistent
+    exp.__trac3Internals = {Wrapper,ElementWrapper,ElementWrapperList,Prop,version:'0.0.1'}
     const allElementNames = "a,abbr,acronym,address,applet,area,article,aside,audio,b,base,basefont,bb,bdo,big,blockquote,body,br,button,canvas,caption,center,cite,code,col,colgroup,command,datagrid,datalist,dd,del,details,dfn,dialog,dir,div,dl,dt,em,embed,eventsource,fieldset,figcaption,figure,font,footer,form,frame,frameset,h1,h2,h3,h4,h5,h6,head,header,hgroup,hr,html,i,iframe,img,input,ins,isindex,kbd,keygen,label,legend,li,link,map,mark,menu,meta,meter,nav,noframes,noscript,object,ol,optgroup,option,output,p,param,pre,progress,q,rp,rt,ruby,s,samp,script,section,select,small,source,span,strike,strong,style,sub,sup,table,tbody,td,textarea,tfoot,th,thead,time,title,tr,track,tt,u,ul,var,video,wbr"
     allElementNames.split(',').forEach(elementName=>exp[elementName] = //for every element type. add a function to exp of with that name as a type
         (attr,content,tooMany)=>generateElement(elementName,attr,content,tooMany));//the function takes 2 arguments. 3 is "tooMany" and will throw an error 

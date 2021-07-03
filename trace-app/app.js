@@ -2,11 +2,19 @@ traceInit(window)
 routerInit(window)
 
 let __router = new Trac3Router(homePageComp,window)
-
+let a = new RenderProp('test')
 div({},[
-     div({class:'background'},[
+    a.display((x,r)=>input({onkeyup:e=>r.bind(e),value:x},[])),
+    
+    
+    div({class:'background'},[
         headerComponent(),
+        a.display(x=>p(x)),
         div({class:'app-body'},[
+            a.display((x,r)=>div([
+                p(x),
+                a.display((x,r)=>input({onkeyup:e=>r.bind(e),value:x},[]))
+            ])),
             __router.display(x=>x()),
         ]),
         footerComp()
