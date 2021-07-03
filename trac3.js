@@ -166,6 +166,7 @@ function traceInit(__scope){
             super();
             this.__value = value;//value that represents the state of the render prop
             this.wrappers = [];//holds a list of wrappers that need to be updated when the value is changed
+            this.boundWrappers = [];
             this.hidden = false;
         }
         get val(){
@@ -177,23 +178,35 @@ function traceInit(__scope){
         __setValue(value,element){
             this.__value = value;//change the value/
             this.baseChange()//apply any changes that the base class needs.
-            this.wrappers = this.wrappers.filter(x=>x.update(element))//re-run all the render functions for the wrappers
+            this.wrappers = this.wrappers.filter(x=>x.update())//re-run all the render functions for the wrappers
+            this.boundWrappers = this.boundWrappers.filter(x=>x.update(element))//re-run all the render functions for the wrappers
+        }
+        update(funct){
+            funct = funct || (x=>x);
+            this.val = funct(this.val);
         }
         display(renderFunction){//adds a new wrapper to be updated when the value is changed.
+            return this.__displayShared(renderFunction,this.wrappers);//call the shared display, use the default wrapper list
+        }
+        boundDisplay(renderFunction){//same as display, but the wrappers get added to a different array (this will stop re-renders while typing.)
+            return this.__displayShared(renderFunction,this.boundWrappers);//the boundWrappers will not update if the element being changed in inside the wrapper
+        }
+        __displayShared(renderFunction,wrapperArr){
             super.display(renderFunction);//check for errors.
             let newWrapper = new ElementWrapper((p,ref)=>{//create a new wrapper that will be updated wrappers take a "render function" that is normally a function of another element wrapper
                 var val = renderFunction(this.__value,this)//this time we call the render function, and pass in the value and the reference to the the whole renderProp (useful for list items)
                 return  val.render && val.render(p,ref) || div({style:'display:none !important'},[]).render(p,ref);//add a blank div if no render function is available. TODO 38383
             });//when called render function we pass in returns an element wrapper. which has its own render function which we then call with the parent element wrapper 
-            this.wrappers.push(newWrapper);//push the new wrapper so it can be accessed later and updated if needed.
+            wrapperArr.push(newWrapper);//push the new wrapper so it can be accessed later and updated if needed.
             return newWrapper;//return the element wrapper so the parent has a reference to it.
         }
-        bind(event_element,value){
+        boundUpdate(event_element,value){//when the boundUpdate is triggered, the wrapper containing the element is not updated (this stops re-renders while typing.)
             let $element = event_element?.target || event_element; //get the event.target, or just the target (element)
             if(!$element) throw "element or event not provided";
             value = value || $element.value;//get the value from the element or from the parameter
             this.__setValue(value,$element)//call the __setValue function but hand in the element so this element wont be updated.
         }
+
     }
     //This Class is a render prop that is inside a render list. it has a few extra features to easy use of renderLists
     class RenderListProp extends RenderProp{
