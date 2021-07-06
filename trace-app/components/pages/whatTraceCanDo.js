@@ -20,7 +20,7 @@ function whatTraceCanDo(){
             monitor(),
             p('Output:'),
             changingGrid(),
-            buttonComp('Hide',()=>{cont.val=false,hideFunct()},'accent-alt-color'),
+            buttonComp('Close',()=>{cont.val=false,hideFunct()},'accent-alt-color'),
         ]);
 
         function goCray(){
@@ -106,7 +106,7 @@ function whatTraceCanDo(){
             }),
             time.display(x=>x && p(`It took ${x/100} seconds`)),
             elementNum.display(x=>div({class:'stress-test'},genLoop(x,()=>div()))),
-            buttonComp('Hide',hideFunct,'accent-alt-color')
+            buttonComp('Close',hideFunct,'accent-alt-color')
         ])
     }
 }
