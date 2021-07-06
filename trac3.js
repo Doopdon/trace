@@ -273,9 +273,9 @@ function traceInit(__scope){
         move(sourceIndex,destIndex){
             if(sourceIndex === destIndex) return;//no need to continue, the item is where it should be.
             if(sourceIndex<0 || sourceIndex>=this.renderProps.length)//check the source and destination are in-bounds
-                throw `Cannot move: Source Index [${sourceIndex}] out of bounds`
+                throw `Cannot move: Source Index [${sourceIndex}] is out of bounds`
             if(destIndex<0 || destIndex>=this.renderProps.length)
-                throw `Cannot move: Destination Index [${destIndex}] out of bounds`
+                throw `Cannot move: Destination Index [${destIndex}] is out of bounds`
             let propId = this.renderProps[sourceIndex].__id;//save the prop id
             let val = this.deleteAt(sourceIndex,false);//delete the item, (do not remap)
             this.insertAt(destIndex,val,propId);//add the item back in at the correct location. use the prop id instead of generating a new one.
