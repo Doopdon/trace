@@ -122,8 +122,8 @@ function renderProps(){
         let t = new RenderProp('change this text')
         return div([
             t.display(x=>p(x)),
-            t.boundDisplay(x=>input({onkeyup:(e)=>{t.boundUpdate(e)},value:x},'')),
-            t.boundDisplay(x=>input({onkeyup:(e)=>{t.boundUpdate(e)},value:x},''))
+            t.display((x,r)=>input({onkeyup:r.bUp(),value:x},'')),
+            t.display(x=>input({onkeyup:t.boundUpdate.bind(t),value:x},'')),
         ])
     }
 }

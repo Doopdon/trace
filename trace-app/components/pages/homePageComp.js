@@ -5,7 +5,7 @@ function homePageComp(){
             [h3('What is Trac³'),
              p('Trac³ is a View Engine made by someone who is tired of huge bloat, learning curves that resemble a vertical line. Also "transpiling" which seems to take so long I can go on reddit, make a post and get 3 down votes before it finishes. I just want to generate html with javascript without a doctorate degree in computer engineering from Vaser.'),
              p('Sorry about the rant. All trace is is an ultra low weight javascript tool that looks similar to html, but never stops being pure, un transpiled javascript, it can be copy-pasted into any html file and it will start running and with no fuss.'),
-             buttonComp('Javascript that looks like HTML',function(){__router.val = whatIsTrace})]
+             buttonComp('Javascript that looks like HTML',()=>{__router.val = whatIsTrace})]
         ),
         spacer(),
         displayBox({class:'right'},
