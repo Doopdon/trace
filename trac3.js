@@ -30,9 +30,7 @@ function traceInit(__scope){
             this.childWrappers = [];//Holds a list of all the chid element wrappers so traversal can happen.
         }    
         update($triggerElem){//when something is changed, the render function needs to be re run.
-            if($triggerElem && //if the trigger element is used as a param
-                this.$element == $triggerElem || //and this wrapper element is the trigger element
-                 this.$element.contains($triggerElem)) return true;//or this wrapper element contains the trigger element, then do not update, the elements changes are triggered by the user
+            if($triggerElem && this.$element.contains($triggerElem)) return true;//if the element param is present and this wrappers element contains it. do not update
             if(!document.contains(this.$parent)) return false;//if the parent is not on the document the wrapper needs to be removed from memory. (false indicates it is not on the dom)
             this.render(this.$parent,this.parentWrapper);//
             return true;
