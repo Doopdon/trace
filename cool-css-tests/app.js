@@ -9,7 +9,9 @@ div({id:'main-div'},[
     ]),
     div({id:'main-content'},[
         div({class:'info-box blue-tron'},[
-            'test test'
+            div({class:'button-red'},[
+                div('♥')
+            ])
         ]),
         // div({class:'info-box yellow-scheme 2'},[
         //     'test test'

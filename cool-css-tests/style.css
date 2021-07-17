@@ -63,3 +63,20 @@ body{
     /* background: radial-gradient(at bottom right,rgb(0, 0, 0,0),rgb(0, 0, 0,0),rgb(0, 0, 255,.5)); */
     background-image: linear-gradient(to bottom right, rgb(49, 61, 233), rgb(255, 255, 255,0));
 }
+
+.button-red{
+    padding:20px;
+}
+.button-red>div{
+    color: hsl(313, 100%, 50%);
+    font-size: xx-large;
+    border-radius: 50%;
+    border: 1px solid hsl(313, 100%, 50%);;
+    display: grid;
+    position: relative;
+    top:10px;
+    left:10px;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+}
