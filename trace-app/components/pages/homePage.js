@@ -1,4 +1,4 @@
-function homePageComp(){
+function homePage(){
     return div([
         spacer(),
         displayBox({},

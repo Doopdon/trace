@@ -1,7 +1,7 @@
 traceInit(window)
 routerInit(window)
 
-let __router = new Trac3Router(homePageComp,window)
+let __router = new Trac3Router(homePage,window)
 
 div({},[
      div({class:'background'},[

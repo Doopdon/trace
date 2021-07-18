@@ -310,7 +310,7 @@ function traceInit(__scope){
                     return content.render($element,elementWrapperRef);//render the wrapper (this will call its "create element" function outlined above)
                 if(content instanceof Element)//if its an element (if you create an element and put it in, it will still work)
                     return $element.appendChild(content);//add content to the parent element above since its an element TODO test this
-                $element.innerHTML+= content.toString();//if its a string, set the inner html to it. no more elements need to be generated as its children TODO dont use innerHTML
+                $element.textContent += content.toString();//if its a string, set the inner html to it. no more elements need to be generated as its children TODO dont use innerHTML
             }
             //applies the attributes to the element
             function applyAttributes(attributes){

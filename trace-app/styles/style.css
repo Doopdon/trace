@@ -71,6 +71,10 @@ input{
     height: 100px;
 }
 
+.spacer-small{
+    height: 20px;
+}
+
 .render-prop-demo textarea{
     resize: none;
     box-shadow: none;

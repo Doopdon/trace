@@ -43,11 +43,11 @@ function menuComp(){
 
     function menu(){
         var items = {
-            'Home':homePageComp,
+            'Home':homePage,
+            'What is it':whatIsTrace,
             'Installing':installingTrace,
             'Learning':learnTrace,
             'RenderProps':renderProps,
-            'What is it':whatIsTrace,
             'What Can it Do':whatTraceCanDo,
             'Syntax':elementWrappers,
             'Components':componentsDemoComp,
@@ -65,7 +65,7 @@ function menuComp(){
 }
 
 function titleComp(){
-    return div({class:'title',onclick:()=>__router.val = homePageComp},[
+    return div({class:'title',onclick:()=>__router.val = homePage},[
         'Trac³'
     ])
 }
