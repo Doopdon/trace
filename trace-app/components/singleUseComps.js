@@ -42,22 +42,22 @@ function menuComp(){
     }
 
     function menu(){
-        var items = {
-            'Home':homePage,
-            'What is it':whatIsTrace,
-            'Installing':installingTrace,
-            'Learning':learnTrace,
-            'RenderProps':renderProps,
-            'What Can it Do':whatTraceCanDo,
-            'Syntax':elementWrappers,
-            'Components':componentsDemoComp,
-        }
+        var items = [
+            ['Home',homePage],
+            ['What is Trace',whatIsTrace],
+            ['Installing',installingTrace],
+            ['Learning',learnTrace],
+            ['Syntax',elementWrappers],
+            ['Components',componentsDemoComp],
+            ['RenderProps',renderProps],
+            ['THE POWER',whatTraceCanDo],
+        ]
 
         return div({class:'main-menu-wrapper'},[
             div({class:'main-menu-content'},[
                 displayBox({class:'main-menu-box'},[
-                    keyVal(items).filter(x=>__router.val.name != x.val.name)
-                    .map(x=>buttonComp(x.key,()=>__router.val = x.val))
+                    items.filter(x=>__router.val.name != x[1].name)
+                    .map(x=>buttonComp(x[0],()=>__router.val = x[1]))
                 ])
             ])
         ])

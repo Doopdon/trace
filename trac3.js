@@ -298,7 +298,8 @@ function traceInit(__scope){
         //understanding why the first parameter is unused is difficult (even for me) basically the virtual dom, made of ElementWrappers, is created bottom up. so the elements with no children, followed by their parents. But the dom needs to create the parents first then the children. The generate element does not actually place the element on the dom. the Element wrapper does, and it uses a parent element. But this function does not, but since its called by the ElementWrapper like it does we need to ignore the first param.
         function createElement(intentionallyUnused,elementWrapperRef){//All you really need to know is that if you take it out it breaks.
             let $element = document.createElement(elementType);//generate the element of the given type
-            applyContent(content);//apply the content that is usually given in the "[]" second param
+            if(typeof content === 'string') $element.textContent += content;//if there is only a string parameter, set the textContent TODO make this work with arays somehow
+            else applyContent(content);//apply the content that is usually given in the "[]" second param
             applyAttributes(attributes)//apply the attributes to the element
             return $element;//return the created element
             //applies the content that the element contains.
@@ -310,7 +311,7 @@ function traceInit(__scope){
                     return content.render($element,elementWrapperRef);//render the wrapper (this will call its "create element" function outlined above)
                 if(content instanceof Element)//if its an element (if you create an element and put it in, it will still work)
                     return $element.appendChild(content);//add content to the parent element above since its an element TODO test this
-                $element.textContent += content.toString();//if its a string, set the inner html to it. no more elements need to be generated as its children TODO dont use innerHTML
+                $element.innerHTML += content.toString();//if its a string, set the inner html to it. no more elements need to be generated as its children TODO dont use innerHTML
             }
             //applies the attributes to the element
             function applyAttributes(attributes){
@@ -351,6 +352,8 @@ function traceInit(__scope){
 
     //2232
     //76767
+
+    //todo h3(['If you want to get started <h1>this should not be an element </h1> you can look into installing trace here:',a({href:window.location.href.split('?')[0]+'?installingTrace'},'installing trace'),'Have fun!']) this does not work.
 
     //todo looks like there is an issue with swapping double arrays out. It seems to break sub "display" functions but only for large numbers
     
