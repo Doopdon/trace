@@ -3,8 +3,7 @@ function learnTrace(){
         spacer(),
         displayBox([
             h2('Getting Started'),
-            p('First you need to "install" trace...'),
-            buttonComp('"Installing" Trac³', ()=>__router.val = installingTrace),
+            p(['First you need to ',linkComp(installingTrace,'"install"'),' Trac³.']),
             p('The first thing you need to do is open the "app.html" file in a browser'),
             p('You should see "hello world" on the screen'),
             p('Lets take a look at the app.js file...'),

@@ -52,3 +52,8 @@ function hidShow(title,renderFunct){
     ])
 
 }
+
+function linkComp(functionName,text){
+    functionName = functionName.name || functionName;
+    return  a({href:`${window.location.href.split('?')[0]}?${functionName}`},text);
+}
