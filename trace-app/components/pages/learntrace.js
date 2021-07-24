@@ -3,7 +3,7 @@ function learnTrace(){
         spacer(),
         displayBox([
             h2('Getting Started'),
-            p(['First you need to ',linkComp(installingTrace,'"install"'),' Trac³.']),
+            p(['First you need to ',innerLinkComp(installingTrace,'"install"'),' Trac³.']),
             p('The first thing you need to do is open the "app.html" file in a browser'),
             p('You should see "hello world" on the screen'),
             p('Lets take a look at the app.js file...'),
@@ -13,7 +13,11 @@ function learnTrace(){
         displayBox([
             h2('traceInit(window):'),
             p('traceInit is a function that comes with trace, when you add the trace script to your html file, "traceInit" is the only function you can use'),
-            p(['This is done to avoid ', a('polluting the global scope'), 'So nothing will change in your app accept that "traceInit" is now a function']),
+            p(['This is done to avoid ',
+             a({href:'https://stackoverflow.com/questions/8862665/what-does-it-mean-global-namespace-would-be-polluted/13352212'},
+             'polluting the global scope.'),
+              ' So nothing will change in your app accept that "traceInit" is now a function'
+            ]),
             p('when you call "traceInit" it will return an object with all the functionality of trace.'),
             p('However if you use var x = traceInit() you will have to use x.div ... x.RenderProp .... ect which can be annoying'),
             p('What I suggest especially if you are starting new is to use "traceInit(window)" the parameter traceInit takes is the object that will have all the functionality attached to it.'),
@@ -22,15 +26,21 @@ function learnTrace(){
         spacer(),
         displayBox([
             h2('div("hello world").render("root")'),
-            p('Lets start with the "div("hello world")" part.'),
+            p('Let\'s start with the "div("hello world")" part.'),
             p('This is simply a function called "div" that returns a "trace element" called an "element wrapper".'),
-            p(['This element wrapper is what tells the ', a('DOM'), 'how to build an element. In this case: build a Div with the content of "hello world",']),
+            p(['This element wrapper is what tells the ',
+             a({href:'https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction'},'DOM'),
+             ' how to build an element. In this case: build a Div with the content of "hello world",'
+            ]),
             p('Now look at the ".render("root")" part. This adds the element to an element already on the dom. The "root" string is the id of the element in-which you want to insert the new div into.'),
             p('You can also replace "root" with Document.getElementById("root") or $(".complicated .jquery > selector")[0], or any other function that returns a DOM element'),
-            p('The render function just takes an element, or a string representing an Id'),
+            p('The render function just takes an element, or a string representing an Id.'),
         ]),
-        // p('The first thing you need to do is create an element so that you can get ahold of the syntax'),
-        // p('In the app file after "traceInit(window)" in the "div("hello world").render("root")" function, replace the "hello world" string with "h1("my first trace app")"'),
-        // p('')
+        spacer(),
+        displayBox([
+            'Now that we have an understanding of a how a trace application is added to the page let\'s start looking at some more complicated', innerLinkComp(elementWrappers,'HTML Generation')
+        ]),
+        spacer(),
+
     ])
 }

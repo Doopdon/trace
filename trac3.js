@@ -330,11 +330,11 @@ function traceInit(__scope){
         }
     }
 
-    let exp = __scope || window;
+    let exp = __scope || {};
     exp.RenderProp = RenderProp;
     exp.RenderList = RenderList;
     exp.trace3globals = {};//to be use by other plugins to stay consistent
-    exp.__trac3Internals = {Wrapper,ElementWrapper,ElementWrapperList,Prop,version:'0.0.1'}
+    exp.__trac3Internals = {RenderListProp,Wrapper,ElementWrapper,ElementWrapperList,Prop,version:'0.0.1'}
     const allElementNames = "a,abbr,acronym,address,applet,area,article,aside,audio,b,base,basefont,bb,bdo,big,blockquote,body,br,button,canvas,caption,center,cite,code,col,colgroup,command,datagrid,datalist,dd,del,details,dfn,dialog,dir,div,dl,dt,em,embed,eventsource,fieldset,figcaption,figure,font,footer,form,frame,frameset,h1,h2,h3,h4,h5,h6,head,header,hgroup,hr,html,i,iframe,img,input,ins,isindex,kbd,keygen,label,legend,li,link,map,mark,menu,meta,meter,nav,noframes,noscript,object,ol,optgroup,option,output,p,param,pre,progress,q,rp,rt,ruby,s,samp,script,section,select,small,source,span,strike,strong,style,sub,sup,table,tbody,td,textarea,tfoot,th,thead,time,title,tr,track,tt,u,ul,var,video,wbr"
     allElementNames.split(',').forEach(elementName=>exp[elementName] = //for every element type. add a function to exp of with that name as a type
         (attr,content,tooMany)=>generateElement(elementName,attr,content,tooMany));//the function takes 2 arguments. 3 is "tooMany" and will throw an error 
