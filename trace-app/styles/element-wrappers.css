@@ -1,0 +1,50 @@
+:root{
+    --red: rgb(177, 92, 92);
+    --blue:rgb(93, 108, 189);
+    --green:rgb(142, 206, 115);
+    --yellow:rgb(197, 193, 109);
+    --white:rgb(199, 226, 228);
+}
+
+.wrapper-exp{
+    color: white;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.wrapper-exp .wrapper{
+    box-shadow: none;
+    margin: 5px;
+    padding:5px;
+    padding-left:10px;
+    border-radius: 10px;
+    /* display: inline-block; */
+}
+
+.wrapper-exp .element{
+    background: var(--white);
+    color:rgb(58, 58, 46);
+    box-shadow: none;
+    display: inline-block;
+    margin: 5px;
+    border-radius: 14px;
+    padding: 5px;
+
+}
+
+.wrapper-exp .red-wrapper{
+    background: var(--red);;
+}
+
+.wrapper-exp .blue-wrapper{
+    background: var(--blue);;
+}
+
+.wrapper-exp .green-wrapper{
+    background: var(--green);;
+}
+
+.wrapper-exp .yellow-wrapper{
+    background: var(--yellow);;
+}
