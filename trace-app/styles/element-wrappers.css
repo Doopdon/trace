@@ -8,7 +8,7 @@
 
 .wrapper-exp{
     color: white;
-    width: 50%;
+    width: max(50%, 400px);
     margin-left: auto;
     margin-right: auto;
 }

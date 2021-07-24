@@ -32,44 +32,45 @@ function elementWrappers(){
 
     function wrapperExplanation(){
         return div({class:'wrapper-exp'},[
-            wrapperExp([
-                wrapperExp([],'blue-wrapper'),
-                wrapperExp([],'blue-wrapper'),
-                wrapperExp([
-                    wrapperExp([],'green-wrapper'),
+            wrapperExp(['[Parent]',
+                wrapperExp(['[Child]'],'blue-wrapper'),
+                wrapperExp(['[Child]'],'blue-wrapper'),
+                wrapperExp(['[Child]',
+                    wrapperExp(['[Child\'s-Child]'],'green-wrapper'),
                 ],'blue-wrapper'),
-                wrapperExp([],'blue-wrapper'),
+                wrapperExp(['[Child]'],'blue-wrapper'),
             ],'red-wrapper')
         ]);
     }
-
+    
+    function elementExplanation(){
+        return div({class:'wrapper-exp'},[
+            elementExp(['[Parent]',
+                elementExp(['[Child]'],'blue-wrapper'),
+                elementExp(['[Child]'],'blue-wrapper'),
+                elementExp(['[Child]',
+                    elementExp(['[Child\'s-Child]'],'green-wrapper'),
+                ],'blue-wrapper'),
+                elementExp(['[Child]'],'blue-wrapper'),
+            ],'red-wrapper')
+        ]);
+    }
+    
     function listWrapperExplanation(){
         return div({class:'wrapper-exp'},[
-            wrapperExp([
-                wrapperExp([],'red-wrapper'),
-                listWrapperExp([
-                    wrapperExp([],'blue-wrapper'),
-                    wrapperExp([],'blue-wrapper'),
-                    wrapperExp([],'blue-wrapper'),
-                    wrapperExp([],'blue-wrapper'),
+            wrapperExp(['[Parent]',
+                wrapperExp(['[Child]'],'red-wrapper'),
+                listWrapperExp(['Has 3 Children but no Element',
+                    wrapperExp(['[Child]'],'blue-wrapper'),
+                    wrapperExp(['[Child]'],'blue-wrapper'),
+                    wrapperExp(['[Child]'],'blue-wrapper'),
                 ],'green-wrapper'),
+                listWrapperExp(['Has 0 children'],'green-wrapper'),
                 wrapperExp([],'red-wrapper'),
             ],'blue-wrapper')
         ]);
     }
 
-    function elementExplanation(){
-        return div({class:'wrapper-exp'},[
-            elementExp([
-                elementExp([],'blue-wrapper'),
-                elementExp([],'blue-wrapper'),
-                elementExp([
-                    elementExp([],'green-wrapper'),
-                ],'blue-wrapper'),
-                elementExp([],'blue-wrapper'),
-            ],'red-wrapper')
-        ]);
-    }
 
     function elementExp(inner,className){
         return [ 
