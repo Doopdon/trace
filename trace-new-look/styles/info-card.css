@@ -1,0 +1,21 @@
+.info-card{
+    width: 50vw;
+    height: 50vh;
+    margin-left: 400px;
+    position: relative;
+    border: 1px solid hsla(0, 100%, 50%, 0);
+    border-left: 1px solid var(--white);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    background: hsla(0, 0%, 47%, 0.103);
+}
+
+/* .info-card .ic-blur{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top:0;
+    left: 0;
+    filter: blur(5px);
+    background: hsla(0, 0%, 100%, 0.205);
+} */
