@@ -42,7 +42,7 @@ function homePage(){
             p('test'),
             p('test'),
             p('test'),
-            infoCardComp('This is some text'),
+            displayBox('This is some text'),
             p('test'),
             p('test'),
             p('test'),
