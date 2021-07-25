@@ -1,0 +1,28 @@
+:root{
+    --white: hsl(0, 0%, 65%);
+    --grey: hsl(0,0%,22%);
+}
+
+body{
+    background: var(--grey);
+    overflow: hidden;
+    color:var(--white);
+    font-family: "Century Gothic", sans-serif;
+    letter-spacing: 2.2px;
+    font-weight: 100;
+}
+
+h1, h2, h3 ,h4{
+    font-weight: 100;
+}
+
+.background-container, .for-ground-container{
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+}
+.for-ground-container{
+    z-index: 100;
+}

@@ -1,0 +1,18 @@
+.space-scene {
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    place-items: center;
+}
+
+.space-scene .planet {
+    background: var(--grey);
+    width: 50vh;
+    height: 50vh;
+    border-radius: 50%;
+    box-shadow: -5px -10px 20px hsl(41, 51%, 57%), -5px -10px 80px red;
+
+
+
+    background:radial-gradient(circle at -100% -100%, rgb(172, 103, 76), var(--grey))
+}
