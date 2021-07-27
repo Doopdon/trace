@@ -2,6 +2,12 @@ function homePage(){
     return div([
         spacer(),
         spacer(),
+        spacer(),
+        spacer(),spacer(),
+        spacer(),spacer(),
+        spacer(),spacer(),
+        spacer(),spacer(),
+        spacer(),
         displayBox({},
             [h3('What is Trac³'),
              p('Trac³ is a View Engine made by someone who is tired of huge bloat, learning curves that resemble a vertical line. Also "transpiling" which seems to take so long I can go on reddit, make a post and get 3 down votes before it finishes. I just want to generate html with javascript without a doctorate degree in computer engineering from Vaser.'),

@@ -4,12 +4,17 @@
     /* margin-left: 400px; */
     position: relative;
     border: 1px solid hsla(0, 100%, 50%, 0);
-    border-left: 1px solid var(--white);
+    /* border-left: 1px solid var(--white); */
     overflow: hidden;
-    backdrop-filter: blur(10px);
-    background: hsla(0, 0%, 47%, 0.103);
-    padding:10px;
+    
     letter-spacing: 3px;
     margin-left:10%;
     margin-right:10%;
+}
+
+.info-card,.info-card-inner{
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: hsla(0, 0%, 47%, 0.103);
+    padding:10px;
 }

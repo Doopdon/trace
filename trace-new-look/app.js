@@ -1,10 +1,14 @@
 traceInit(window);
+routerInit(window);
+
+let __router = new Trac3Router(homePage,window);
+
 (()=>{
     div({class:'_app'},[
         div([
             forGround([
             banner(),
-            homePage(),
+            __router.display(x=>x())
             ]),
             background(),
         ]),
@@ -12,7 +16,7 @@ traceInit(window);
 
     function banner(){
         return div({class:'banner'},[
-            h1('TRAC³'),
+            h1({onclick:()=>__router.val = homePage},'TRAC³'),
             div({class:'banner-options'}, bannerMenuComp())
         ]);
     }
