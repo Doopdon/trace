@@ -62,3 +62,17 @@
 .spacer-small{
     height: 20px;
 }
+
+.move-up-spacer{
+    animation: move-up 2.5s forwards cubic-bezier(0, 0, 0.13, 1.05);
+}
+
+@keyframes move-up{
+    from {
+        height:150vh
+    }
+    to {
+        height: 25vh
+    }
+}
+  

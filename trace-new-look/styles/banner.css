@@ -18,7 +18,8 @@
 .banner .banner-option{
     margin: 10px;
     cursor: pointer;
-    border-bottom: 1px solid rgba(56, 56, 56, 0);;
+    border-bottom: 1px solid rgba(56, 56, 56, 0);
+    transition: 500ms;
 }
 
 .banner .banner-option:hover{

@@ -25,14 +25,9 @@ function editField(renderProp,attributes){
     })
 }
 
-// function displayBox(attributes,body){
-//     if(!body) {
-//         body = attributes;
-//         attributes = {};
-//     }
-//     attributes.class = attributes.class && attributes.class + ' info-box' || 'info-box';
-//     return div(attributes,[body]);
-// }
+function moveUpSpacer(inner){
+    return div({class:'move-up-spacer'},[inner])
+}
 
 function spacer(){
     return div({class:'spacer'},[])
