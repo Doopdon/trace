@@ -14,12 +14,7 @@ let __router = new Trac3Router(homePage,window);
         ]),
     ]).render('root')
 
-    function banner(){
-        return div({class:'banner'},[
-            h1({onclick:()=>__router.val = homePage},'TRAC³'),
-            div({class:'banner-options'}, bannerMenuComp())
-        ]);
-    }
+ 
 
     function forGround(inner){
         return div({class:'for-ground-container'},[
