@@ -1,6 +1,8 @@
 :root{
     --white: hsl(0, 0%, 65%);
     --grey: hsl(0,0%,22%);
+
+    --grey2: hsl(0, 0%, 45%);
     /* old stuff */
     --base:rgb(180, 180, 180);
     --ground:rgb(46, 46, 46);
@@ -29,6 +31,17 @@ h1, h2, h3 ,h4{
     width: 100vw;
     height: 100vh;
 }
+
+.background-container{
+    background: linear-gradient(to bottom right ,var(--grey), var(--grey2));
+}
+
+.background-container .inner{
+    margin:5vw;
+    height: calc(100vh -  10vw);
+    background: linear-gradient(to top left ,var(--grey), var(--grey2));  
+}
+
 .for-ground-container{
     z-index: 100;
     overflow: scroll;

@@ -17,15 +17,15 @@ let __router = new Trac3Router(homePage,window);
  
 
     function forGround(inner){
-        return div({class:'for-ground-container'},[
-            inner
-        ])
+        return div({class:'for-ground-container'},[inner])
     }
 
     function background(){
         return div({class:'background-container'},[
-            div({class:'space-scene'},[
-                div({class:'planet'},[])
+            div({class:'inner'},[
+                div({class:'space-scene'},[
+                    div({class:'planet'},[])
+                ])
             ])
         ])
     }

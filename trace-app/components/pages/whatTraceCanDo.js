@@ -96,7 +96,7 @@ function whatTraceCanDo(){
         return displayBox([
             h2('Stress Test'),
             p('Here you can make N number of 1x1 px divs by entering N into the text box and clicking "Go". (be warned 1000000+ tends to freeze the browser up)'),
-            input({onkeyup:e=>{elementInput.val=e.target.value}, value:elementInput.val},[]),
+            input({type:'number',onkeyup:e=>{elementInput.val=e.target.value}, value:elementInput.val},[]),
             elementInput.display(x=>div([`make ${numberWithCommas(x)} elements`])),
             buttonComp('Go',()=>{
                 let t1 = new Date().getTime();
