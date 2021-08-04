@@ -1,5 +1,5 @@
 function homePage(){
-    return div({class:'home-page'},[
+    return div({class:'home-page page'},[
         moveUpSpacer(),
         displayBox({},
             [h2('Trac³:'),
@@ -10,11 +10,17 @@ function homePage(){
         spacer(),
         spacer(),
         displayBox({},
-            [h2('Simple:'),
-             h3('There is no worse tool than the one you don\'t know how to use'),
-             h3(['Trace³ gives you just what you need, and nothing more']),
-             h3(['You can install it and work with it in less than 5 minutes.']),
-             h3(['You can fully understand it in an afternoon']),
+            [h3('100Kb'),
+             h3('This entire trace web page, non-minified, is only 100kb.'),
+             h3('It\'s featherweight.')
+            ]
+        ),
+        spacer(),
+        spacer(),
+        displayBox({},
+            [
+             h3('There are no providers, injectables, node_modules, transpilers or other complications'),
+             h3(['It\'s pure ', b('simple'), ' browser readable javascript.'])
             ]
         ),
         spacer(),
@@ -22,24 +28,24 @@ function homePage(){
         displayBox({},[
              h3('Trac³ has no structure, no best practice, no "right way".'),
              h3('You may find this terrifying or liberating.'),
-             h3('But the truth is, there never was a "right way".')
+             h3('But the truth is, there never was a "right way".'),
+             h3('Trac³ gives you unmatched flexibility')
             ]
         ),
         spacer(),
         spacer(),
         displayBox({},[
             h3('Trac³ can generate a hundred thousand elements less than a second'),
-            h3('You can change and update thousands of them at once with minimal performance drops'),
-            h3('What it lacks in complexity it makes up for in efficiency'),
+            h3('This out paces React and Angular by an order of magnitude'),
+            h3('It can update thousands of elements at once'),
+            h3([b('it\'s powerful')]),
         ]),
         spacer(),
         spacer(),
-        displayBox({},
-            [h2('Light Weight:'),
-             h3('This entire site is unminified, it contains the unminified Trac³ source code.'),
-             h3('It\'s less than 100kb.')
-            ]
-        ),
+        spacer(),
+        spacer(),
+        spacer(),
+        spacer(),
         spacer(),
         spacer(),
     ])

@@ -30,7 +30,7 @@ function displayBox(attributes,body){
         body = attributes;
         attributes = {};
     }
-    attributes.class = attributes.class && attributes.class + ' info-box' || 'info-box';
+    attributes.class = 'info-box '+attributes.class;
     return div(attributes,[body]);
 }
 

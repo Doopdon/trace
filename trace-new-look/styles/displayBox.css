@@ -7,6 +7,10 @@
     animation: fade-in 2.5s forwards ease-out;
 }
 
+.info-card.big{
+    max-width: 90%;
+}
+
 .info-card,.info-card-inner{
     backdrop-filter: blur(5px);
     background: hsla(0, 0%, 47%, 0.103);

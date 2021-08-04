@@ -4,6 +4,7 @@
     width: 100vw;
     z-index: 100;
     backdrop-filter: blur(2px);
+    white-space: nowrap;
 }
 
 .banner h1.banner-option {
@@ -24,13 +25,34 @@
     padding: 5px;
     margin: 5px;
     cursor: pointer;
-    /* border-bottom: 1px solid rgba(56, 56, 56, 0); */
     transition: 500ms;
+    position: relative;
 }
 
+.banner .sub-option:hover,
 .banner .banner-option:hover{
-    /* border-bottom: 1px solid white; */
     background: var(--white);
     color:var(--grey)
+}
 
+.banner .banner-option:hover .sub-option-wrapper{
+    display: block;
+}
+
+.banner .sub-option-wrapper{
+    display: none;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--white)
+    
+}
+
+.banner .info-card.sub-options{
+    max-width: none;
+    animation-duration: 500ms;
+}
+
+.banner .sub-option{
+    transition: 500ms;
 }
