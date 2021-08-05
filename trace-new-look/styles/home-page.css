@@ -1,0 +1,14 @@
+.home-page .size-part{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.home-page .size-part>div{
+    margin:5px;
+}
+
+.home-page .qr-code{
+    width:10vh;
+    box-shadow: 0 0 10px red;
+}

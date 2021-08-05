@@ -15,17 +15,18 @@
 .banner .banner-options{
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: space-around;
     border-bottom: 1px solid var(--white);
     margin-left: 30px;
     margin-right: 30px;
 }
 
+.banner .sub-option,
 .banner .banner-option{
     padding: 5px;
     margin: 5px;
     cursor: pointer;
-    transition: 500ms;
+    transition: 700ms;
     position: relative;
 }
 
@@ -45,14 +46,11 @@
     left: 50%;
     transform: translateX(-50%);
     color: var(--white)
-    
 }
 
 .banner .info-card.sub-options{
-    max-width: none;
-    animation-duration: 500ms;
+    min-width: fit-content;
+    animation-duration: 700ms;
+    background: hsla(0, 0%, 30%, 0.5);
 }
 
-.banner .sub-option{
-    transition: 500ms;
-}

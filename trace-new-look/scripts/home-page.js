@@ -9,12 +9,17 @@ function homePage(){
         spacer(),
         spacer(),
         spacer(),
-        displayBox({},
-            [h3('100Kb'),
-             h3('This entire trace web page, non-minified, is only 100kb.'),
-             h3('It\'s featherweight.')
-            ]
-        ),
+        displayBox([
+            div({class:'size-part'},[
+                div([
+                    h3('Trace fits on this qr code:'),
+                    p('Lightweight is an understatement.'),
+                ]),
+                div([
+                    img({class:'qr-code',src:'./content/qr-code.png'},[])
+                ])
+            ]),
+        ]),
         spacer(),
         spacer(),
         displayBox({},
