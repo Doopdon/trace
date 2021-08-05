@@ -10,7 +10,7 @@ function homePage(){
         spacer(),
         spacer(),
         displayBox([
-            div({class:'size-part'},[
+            div({class:'size-section'},[
                 div([
                     h3('Trace fits on this qr code:'),
                     p('Lightweight is an understatement.'),
@@ -22,12 +22,17 @@ function homePage(){
         ]),
         spacer(),
         spacer(),
-        displayBox({},
-            [
-             h3('There are no providers, injectables, node_modules, transpilers or other complications'),
-             h3(['It\'s pure ', b('simple'), ' browser readable javascript.'])
-            ]
-        ),
+        displayBox([
+            div({class:'simplicity-section',style:{background:'red'}},[
+                div([
+                    h3('There are no providers, injectables, node_modules, transpilers or other complications'),
+                    p(['It\'s pure ', b('simple'), ' browser readable javascript.']),
+                ]),
+                div([
+                    //img({class:'qr-code',src:'./content/simple.jpeg'},[])
+                ])
+            ])
+        ]),
         spacer(),
         spacer(),
         displayBox({},[

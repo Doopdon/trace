@@ -1,14 +1,16 @@
-.home-page .size-part{
+.home-page .size-section{
     display: flex;
     flex-direction: row;
     justify-content: space-around;
 }
 
-.home-page .size-part>div{
+.home-page .size-section>div{
     margin:5px;
+    display: grid;
+    place-items: center;
 }
 
-.home-page .qr-code{
+.home-page .size-section .qr-code{
     width:10vh;
     box-shadow: 0 0 10px red;
 }
