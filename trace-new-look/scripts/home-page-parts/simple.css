@@ -1,0 +1,47 @@
+.simple .content{
+    width:100%;
+    height:100%;
+    border-radius: 5px;
+}
+
+.simple .box{
+    background: hsl(0, 37%, 57%)
+}
+
+.simple .beam{
+    background: hsl(240, 36%, 53%);
+}
+
+.simple .pol{
+    background: hsl(120, 33%, 54%);
+}
+
+.simple .cell{
+    padding:2%;
+}
+
+.simple .row-cell{
+    width: 50%;
+    height: 100%;
+}
+
+.simple .col-cell{
+    width: 100%;
+    height: 50%;
+}
+
+.simple .split{
+    width:100%;
+    height:100%;
+    background:grey;
+    display:flex;
+    border-radius: 5px;
+}
+
+.simple .split-col{
+    flex-direction: column;
+}
+
+.simple .split-row{
+    flex-direction: row;
+}
