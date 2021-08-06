@@ -1,6 +1,7 @@
 function homePage(){
     return div({class:'home-page page'},[
         moveUpSpacer(),
+        homePageSimple(),
         displayBox({},
             [h2('Trac³:'),
              h3(['Feather light, but powerful and flexible.']),
@@ -22,6 +23,7 @@ function homePage(){
         ]),
         spacer(),
         spacer(),
+        
         // displayBox([
         //     div({class:'simplicity-section',
         //         },[
