@@ -2,23 +2,20 @@ function homePageSimple(){
 
     let boxStyle = {
         background:'red',
-        width:'90%',
-        height:'90%',
-        margin:'5%'
+        width:'100%',
+        height:'100%',
     }
 
     let beamStyle = {
         background:'blue',
-        width:'95%',
-        height:'90%',
-        margin:'2.5%'
+        width:'100%',
+        height:'100%',
     }
 
     let polStyle = {
         background:'green',
-        width:'90%',
-        height:'95%',
-        margin:'2.5%'
+        width:'100%',
+        height:'100%',
     }
 
     let rowStyle = {
@@ -39,13 +36,15 @@ function homePageSimple(){
     let rowCellStyle = {
         width:'50%',
         height:'100%',
-        border:'1px solid purple'
+        padding:'5%',
+        border:'1px solid black'
     }
 
     let colCellStyle = {
         width:'100%',
         height:'50%',
-        border:'1px solid purple'
+        padding:'5%',
+        border:'1px solid black'
     }
 
 
