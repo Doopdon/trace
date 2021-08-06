@@ -22,17 +22,24 @@ function homePage(){
         ]),
         spacer(),
         spacer(),
-        displayBox([
-            div({class:'simplicity-section',style:{background:'red'}},[
-                div([
-                    h3('There are no providers, injectables, node_modules, transpilers or other complications'),
-                    p(['It\'s pure ', b('simple'), ' browser readable javascript.']),
-                ]),
-                div([
-                    //img({class:'qr-code',src:'./content/simple.jpeg'},[])
-                ])
-            ])
-        ]),
+        // displayBox([
+        //     div({class:'simplicity-section',
+        //         },[
+        //         div([
+        //             h3('There are no providers, injectables, node_modules, transpilers or other complications'),
+        //             p(['It\'s pure ', b('simple'), ' browser readable javascript.']),
+        //         ]),
+        //         div({style:{
+        //                 'background-image': 'url(./content/simple.jpeg)',
+        //                 'background-size': 'cover',
+        //                 'background-repeat': 'no-repeat',
+        //                 'background-position': 'center',
+        //                 opacity: 0.5,
+        //             }},[
+        //             //img({class:'qr-code',src:'./content/simple.jpeg'},[])
+        //         ])
+        //     ])
+        // ]),
         spacer(),
         spacer(),
         displayBox({},[

@@ -322,7 +322,7 @@ function traceInit(__scope){
                 Object.keys(attributes).forEach(key=>{//go through each key.
                     if(attributes[key] instanceof AttributeInsert)//if the value is an AttributeInsert:
                         attributes[key].generateAttribute(key,$element)//call its generateAttribute method. this will return a value to set the attribute to, as well as tie the element to the AttributeInsert so it can be changed in the future.
-                    else if(key === 'style')
+                    else if(key === 'style' && typeof attributes[key] === 'object')
                         Object.assign($element.style, attributes[key]);
                     else if(typeof attributes[key] === 'function' || key === 'innerHTML')//if a function is handed in or innerHTML: TODO dont use innerHTML
                         $element[key] = attributes[key];//the elements attributes need to be set programmatically, not with setAttribute.
