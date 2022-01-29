@@ -1,5 +1,3 @@
-
-
 function routerInit(__scope){
     class Trac3Router extends __scope.RenderProp{
         constructor(defaultComp,compsObj){

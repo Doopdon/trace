@@ -295,7 +295,10 @@ function traceInit(__scope){
         var attributes = param2 != null ? param1 : null;//if there is a second parameter, the first one is attributes
         var content = param2 != null ? param2 : param1;//if there is no second parameter the first one is the content, otherwise its the second one.
         return new ElementWrapper(createElement)//create a new ElementWrapper with a renderFunction that creates a dom element outlined by the attributes and content parameters.
-        //understanding why the first parameter is unused is difficult (even for me) basically the virtual dom, made of ElementWrappers, is created bottom up. so the elements with no children, followed by their parents. But the dom needs to create the parents first then the children. The generate element does not actually place the element on the dom. the Element wrapper does, and it uses a parent element. But this function does not, but since its called by the ElementWrapper like it does we need to ignore the first param.
+        //understanding why the first parameter is unused is difficult (even for me) basically the virtual dom, made of ElementWrappers, 
+        //is created bottom up. so the elements with no children, followed by their parents. But the dom needs to create the parents first
+        // then the children. The generated element does not actually place the element on the dom. the Element wrapper does, and it uses a parent element. 
+        //But this function does not, but since its called by the ElementWrapper like it does we need to ignore the first param.
         function createElement(intentionallyUnused,elementWrapperRef){//All you really need to know is that if you take it out it breaks.
             let $element = document.createElement(elementType);//generate the element of the given type
             if(typeof content === 'string') $element.textContent += content;//if there is only a string parameter, set the textContent TODO make this work with arays somehow
