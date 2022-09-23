@@ -336,7 +336,7 @@ function traceInit(__scope){
     }
 
     let exp = __scope || {};
-    exp.RenderProp = RenderProp;
+    exp.RenderProp = RenderProp; 
     exp.RenderList = RenderList;
     exp.trace3globals = {};//to be use by other plugins to stay consistent
     exp.__trac3Internals = {RenderListProp,Wrapper,ElementWrapper,ElementWrapperList,Prop,version:'0.0.1'}
