@@ -1,4 +1,4 @@
-import { div } from "../trace";
+import { div } from "./trace";
 
 div({}, [
     div('hey im working')
