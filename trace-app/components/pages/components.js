@@ -21,7 +21,7 @@ function componentsDemoComp(){
             ])
         ]),
         div({},[
-           img({src:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Adriana_Salvatierra_Arriaza_%28Official_Photo%2C_2019%29_Chamber_of_Senators_of_Bolivia.jpg/248px-Adriana_Salvatierra_Arriaza_%28Official_Photo%2C_2019%29_Chamber_of_Senators_of_Bolivia.jpg'},[])
+           img({src:'../view.avif'},[])
         ])
 
     ])

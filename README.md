@@ -11,4 +11,6 @@ TO SEE WHAT IT CAN DO
 
 Go to the menu and click "THE POWER"
 
+Github repo https://github.com/Doopdon/trace
+
 
