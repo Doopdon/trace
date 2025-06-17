@@ -25,6 +25,16 @@ function editField(renderProp, attributes) {
     })
 }
 
+function checkbox(renderProp, attributes) {
+    attributes = attributes || { class: 'block' };
+    return renderProp.display(x => input({
+        type: 'checkbox',
+        checked: renderProp.atr(),
+        class: 'tron-checkbox',
+        onclick: () => renderProp.val = !renderProp.val
+    }, []))
+}
+
 function displayBox(attributes, body) {
     if (!body) {
         body = attributes;

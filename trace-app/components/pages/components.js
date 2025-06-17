@@ -1,7 +1,11 @@
 function componentsDemoComp(){
+    let t = new RenderProp(false)
+
     return div({},[
         div({},[
-            button({onclick:()=>{alert('hey')}},'hey')
+            button({onclick:()=>{alert('hey')}},'hey'),
+            checkbox(t),
+            t.display(x=>h1(x))
         ]),
         div({},[
             h1('h1'),
