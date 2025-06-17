@@ -102,7 +102,8 @@ function renderProps(){
             names.display(x=>p({class:'render-prop-item'},x+',')),
             p('You can see how the list above changes with the editable list below.'),
             names.display((x,r)=>{return div({class:'list-item'},[
-                div({class:'edit-item inline-block'},editField(r,{class:'inline'})),
+                div({class:'edit-item inline-block'},
+                editField(r,{class:'inline'})),
                 buttonComp('🗑',()=>r.delete()),
                 buttonComp('⬆',()=>r.moveTo(r.index-1)),
                 buttonComp('⬇',()=>r.moveTo(r.index+1)),
